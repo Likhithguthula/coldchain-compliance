@@ -1,0 +1,502 @@
+[
+  {
+    "lot_id": "LOT-2026-000001",
+    "product_id": "PROD-2026-0001",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-12-27",
+    "expiry_date": "2027-06-20",
+    "initial_quantity_units": 11771,
+    "remaining_stability_budget_min": 90,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000002",
+    "product_id": "PROD-2026-0002",
+    "manufacturing_site": "CAMBRIDGE-US-02",
+    "manufactured_date": "2025-10-23",
+    "expiry_date": "2026-10-23",
+    "initial_quantity_units": 10051,
+    "remaining_stability_budget_min": 40,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000003",
+    "product_id": "PROD-2026-0003",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-10-31",
+    "expiry_date": "2026-10-31",
+    "initial_quantity_units": 20417,
+    "remaining_stability_budget_min": 60,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000004",
+    "product_id": "PROD-2026-0004",
+    "manufacturing_site": "CAMBRIDGE-US-02",
+    "manufactured_date": "2025-10-17",
+    "expiry_date": "2026-10-17",
+    "initial_quantity_units": 8837,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000005",
+    "product_id": "PROD-2026-0005",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-11-09",
+    "expiry_date": "2027-11-09",
+    "initial_quantity_units": 24050,
+    "remaining_stability_budget_min": 180,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000006",
+    "product_id": "PROD-2026-0006",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-12-19",
+    "expiry_date": "2026-12-19",
+    "initial_quantity_units": 8838,
+    "remaining_stability_budget_min": 30,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000007",
+    "product_id": "PROD-2026-0007",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-10-20",
+    "expiry_date": "2027-10-20",
+    "initial_quantity_units": 9594,
+    "remaining_stability_budget_min": 70,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000008",
+    "product_id": "PROD-2026-0008",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-12-15",
+    "expiry_date": "2027-06-08",
+    "initial_quantity_units": 21797,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000009",
+    "product_id": "PROD-2026-0009",
+    "manufacturing_site": "CAMBRIDGE-US-02",
+    "manufactured_date": "2025-10-15",
+    "expiry_date": "2027-04-08",
+    "initial_quantity_units": 21663,
+    "remaining_stability_budget_min": 80,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000010",
+    "product_id": "PROD-2026-0010",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-11-14",
+    "expiry_date": "2027-05-08",
+    "initial_quantity_units": 4519,
+    "remaining_stability_budget_min": 150,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000011",
+    "product_id": "PROD-2026-0001",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-10-19",
+    "expiry_date": "2026-10-19",
+    "initial_quantity_units": 4638,
+    "remaining_stability_budget_min": 90,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000012",
+    "product_id": "PROD-2026-0002",
+    "manufacturing_site": "CAMBRIDGE-US-02",
+    "manufactured_date": "2025-10-14",
+    "expiry_date": "2027-10-14",
+    "initial_quantity_units": 19311,
+    "remaining_stability_budget_min": 40,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000013",
+    "product_id": "PROD-2026-0003",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-12-05",
+    "expiry_date": "2027-05-29",
+    "initial_quantity_units": 8322,
+    "remaining_stability_budget_min": 60,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000014",
+    "product_id": "PROD-2026-0004",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-11-25",
+    "expiry_date": "2027-11-25",
+    "initial_quantity_units": 5413,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000015",
+    "product_id": "PROD-2026-0005",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-11-24",
+    "expiry_date": "2027-05-18",
+    "initial_quantity_units": 4001,
+    "remaining_stability_budget_min": 180,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000016",
+    "product_id": "PROD-2026-0006",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-10-17",
+    "expiry_date": "2027-04-10",
+    "initial_quantity_units": 9315,
+    "remaining_stability_budget_min": 30,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000017",
+    "product_id": "PROD-2026-0007",
+    "manufacturing_site": "ANTWERP-BE-01",
+    "manufactured_date": "2025-10-08",
+    "expiry_date": "2026-10-08",
+    "initial_quantity_units": 5642,
+    "remaining_stability_budget_min": 70,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000018",
+    "product_id": "PROD-2026-0008",
+    "manufacturing_site": "CAMBRIDGE-US-02",
+    "manufactured_date": "2025-11-08",
+    "expiry_date": "2027-11-08",
+    "initial_quantity_units": 2688,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000019",
+    "product_id": "PROD-2026-0009",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-10-13",
+    "expiry_date": "2026-10-13",
+    "initial_quantity_units": 9707,
+    "remaining_stability_budget_min": 80,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000020",
+    "product_id": "PROD-2026-0010",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-12-12",
+    "expiry_date": "2027-06-05",
+    "initial_quantity_units": 23006,
+    "remaining_stability_budget_min": 150,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000021",
+    "product_id": "PROD-2026-0001",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-10-10",
+    "expiry_date": "2027-10-10",
+    "initial_quantity_units": 4455,
+    "remaining_stability_budget_min": 90,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000022",
+    "product_id": "PROD-2026-0002",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-11-16",
+    "expiry_date": "2026-11-16",
+    "initial_quantity_units": 14908,
+    "remaining_stability_budget_min": 40,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000023",
+    "product_id": "PROD-2026-0003",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-10-01",
+    "expiry_date": "2027-10-01",
+    "initial_quantity_units": 3687,
+    "remaining_stability_budget_min": 60,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000024",
+    "product_id": "PROD-2026-0004",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-10-31",
+    "expiry_date": "2026-10-31",
+    "initial_quantity_units": 7794,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000025",
+    "product_id": "PROD-2026-0005",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-11-08",
+    "expiry_date": "2027-11-08",
+    "initial_quantity_units": 19442,
+    "remaining_stability_budget_min": 180,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000026",
+    "product_id": "PROD-2026-0006",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-12-25",
+    "expiry_date": "2027-06-18",
+    "initial_quantity_units": 3887,
+    "remaining_stability_budget_min": 30,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000027",
+    "product_id": "PROD-2026-0007",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-11-09",
+    "expiry_date": "2027-05-03",
+    "initial_quantity_units": 6433,
+    "remaining_stability_budget_min": 70,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000028",
+    "product_id": "PROD-2026-0008",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-10-04",
+    "expiry_date": "2027-03-28",
+    "initial_quantity_units": 21838,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000029",
+    "product_id": "PROD-2026-0009",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-10-07",
+    "expiry_date": "2026-10-07",
+    "initial_quantity_units": 19043,
+    "remaining_stability_budget_min": 80,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000030",
+    "product_id": "PROD-2026-0010",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-10-02",
+    "expiry_date": "2027-03-26",
+    "initial_quantity_units": 11702,
+    "remaining_stability_budget_min": 150,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000031",
+    "product_id": "PROD-2026-0001",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-11-25",
+    "expiry_date": "2026-11-25",
+    "initial_quantity_units": 13620,
+    "remaining_stability_budget_min": 90,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000032",
+    "product_id": "PROD-2026-0002",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-12-25",
+    "expiry_date": "2026-12-25",
+    "initial_quantity_units": 12863,
+    "remaining_stability_budget_min": 40,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000033",
+    "product_id": "PROD-2026-0003",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-12-22",
+    "expiry_date": "2027-12-22",
+    "initial_quantity_units": 24472,
+    "remaining_stability_budget_min": 60,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000034",
+    "product_id": "PROD-2026-0004",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-12-05",
+    "expiry_date": "2027-12-05",
+    "initial_quantity_units": 18389,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000035",
+    "product_id": "PROD-2026-0005",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-11-05",
+    "expiry_date": "2027-11-05",
+    "initial_quantity_units": 10944,
+    "remaining_stability_budget_min": 180,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000036",
+    "product_id": "PROD-2026-0006",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-11-10",
+    "expiry_date": "2027-11-10",
+    "initial_quantity_units": 20689,
+    "remaining_stability_budget_min": 30,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000037",
+    "product_id": "PROD-2026-0007",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-12-12",
+    "expiry_date": "2027-06-05",
+    "initial_quantity_units": 14219,
+    "remaining_stability_budget_min": 70,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000038",
+    "product_id": "PROD-2026-0008",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-10-23",
+    "expiry_date": "2026-10-23",
+    "initial_quantity_units": 7471,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000039",
+    "product_id": "PROD-2026-0009",
+    "manufacturing_site": "ANTWERP-BE-01",
+    "manufactured_date": "2025-11-29",
+    "expiry_date": "2027-11-29",
+    "initial_quantity_units": 17291,
+    "remaining_stability_budget_min": 80,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000040",
+    "product_id": "PROD-2026-0010",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-10-20",
+    "expiry_date": "2027-10-20",
+    "initial_quantity_units": 3753,
+    "remaining_stability_budget_min": 150,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000041",
+    "product_id": "PROD-2026-0001",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-12-21",
+    "expiry_date": "2027-06-14",
+    "initial_quantity_units": 21603,
+    "remaining_stability_budget_min": 90,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000042",
+    "product_id": "PROD-2026-0002",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-11-04",
+    "expiry_date": "2027-11-04",
+    "initial_quantity_units": 19251,
+    "remaining_stability_budget_min": 40,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000043",
+    "product_id": "PROD-2026-0003",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-10-30",
+    "expiry_date": "2027-10-30",
+    "initial_quantity_units": 18478,
+    "remaining_stability_budget_min": 60,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000044",
+    "product_id": "PROD-2026-0004",
+    "manufacturing_site": "OSAKA-JP-01",
+    "manufactured_date": "2025-11-25",
+    "expiry_date": "2027-11-25",
+    "initial_quantity_units": 7340,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000045",
+    "product_id": "PROD-2026-0005",
+    "manufacturing_site": "CAMBRIDGE-US-02",
+    "manufactured_date": "2025-10-20",
+    "expiry_date": "2027-04-13",
+    "initial_quantity_units": 21069,
+    "remaining_stability_budget_min": 180,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000046",
+    "product_id": "PROD-2026-0006",
+    "manufacturing_site": "HYDERABAD-IN-03",
+    "manufactured_date": "2025-10-03",
+    "expiry_date": "2027-10-03",
+    "initial_quantity_units": 18958,
+    "remaining_stability_budget_min": 30,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000047",
+    "product_id": "PROD-2026-0007",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-12-13",
+    "expiry_date": "2027-06-06",
+    "initial_quantity_units": 8555,
+    "remaining_stability_budget_min": 70,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000048",
+    "product_id": "PROD-2026-0008",
+    "manufacturing_site": "BASEL-CH-01",
+    "manufactured_date": "2025-11-21",
+    "expiry_date": "2027-05-15",
+    "initial_quantity_units": 12760,
+    "remaining_stability_budget_min": 120,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000049",
+    "product_id": "PROD-2026-0009",
+    "manufacturing_site": "CORK-IE-02",
+    "manufactured_date": "2025-10-14",
+    "expiry_date": "2027-10-14",
+    "initial_quantity_units": 8905,
+    "remaining_stability_budget_min": 80,
+    "lifecycle_state": "RELEASED"
+  },
+  {
+    "lot_id": "LOT-2026-000050",
+    "product_id": "PROD-2026-0010",
+    "manufacturing_site": "ANTWERP-BE-01",
+    "manufactured_date": "2025-10-02",
+    "expiry_date": "2027-10-02",
+    "initial_quantity_units": 14252,
+    "remaining_stability_budget_min": 150,
+    "lifecycle_state": "RELEASED"
+  }
+]

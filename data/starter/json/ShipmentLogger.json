@@ -1,0 +1,2225 @@
+[
+  {
+    "assignment_id": "ASSGN-2026-000001",
+    "shipment_id": "SHP-2026-000001",
+    "logger_id": "LOG-SHP-2026-000001-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T06:00:00Z",
+    "deactivated_utc": "2026-01-02T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000002",
+    "shipment_id": "SHP-2026-000002",
+    "logger_id": "LOG-SHP-2026-000002-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T06:50:00Z",
+    "deactivated_utc": "2026-01-02T10:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000003",
+    "shipment_id": "SHP-2026-000003",
+    "logger_id": "LOG-SHP-2026-000003-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000004",
+    "shipment_id": "SHP-2026-000004",
+    "logger_id": "LOG-SHP-2026-000004-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:00:00Z",
+    "deactivated_utc": "2026-01-02T11:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000005",
+    "shipment_id": "SHP-2026-000005",
+    "logger_id": "LOG-SHP-2026-000005-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T10:10:00Z",
+    "deactivated_utc": "2026-01-02T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000006",
+    "shipment_id": "SHP-2026-000006",
+    "logger_id": "LOG-SHP-2026-000006-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T11:10:00Z",
+    "deactivated_utc": "2026-01-02T14:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000007",
+    "shipment_id": "SHP-2026-000007",
+    "logger_id": "LOG-SHP-2026-000007-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T12:10:00Z",
+    "deactivated_utc": "2026-01-02T15:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000008",
+    "shipment_id": "SHP-2026-000008",
+    "logger_id": "LOG-SHP-2026-000008-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:00:00Z",
+    "deactivated_utc": "2026-01-02T15:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000009",
+    "shipment_id": "SHP-2026-000009",
+    "logger_id": "LOG-SHP-2026-000009-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T14:10:00Z",
+    "deactivated_utc": "2026-01-02T17:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000010",
+    "shipment_id": "SHP-2026-000010",
+    "logger_id": "LOG-SHP-2026-000010-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:10:00Z",
+    "deactivated_utc": "2026-01-02T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000011",
+    "shipment_id": "SHP-2026-000011",
+    "logger_id": "LOG-SHP-2026-000011-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T15:50:00Z",
+    "deactivated_utc": "2026-01-02T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000012",
+    "shipment_id": "SHP-2026-000012",
+    "logger_id": "LOG-SHP-2026-000012-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T17:00:00Z",
+    "deactivated_utc": "2026-01-02T19:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000013",
+    "shipment_id": "SHP-2026-000013",
+    "logger_id": "LOG-SHP-2026-000013-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T06:00:00Z",
+    "deactivated_utc": "2026-01-02T08:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000014",
+    "shipment_id": "SHP-2026-000014",
+    "logger_id": "LOG-SHP-2026-000014-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:10:00Z",
+    "deactivated_utc": "2026-01-02T11:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000015",
+    "shipment_id": "SHP-2026-000015",
+    "logger_id": "LOG-SHP-2026-000015-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T10:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000016",
+    "shipment_id": "SHP-2026-000016",
+    "logger_id": "LOG-SHP-2026-000016-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T08:50:00Z",
+    "deactivated_utc": "2026-01-02T11:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000017",
+    "shipment_id": "SHP-2026-000017",
+    "logger_id": "LOG-SHP-2026-000017-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:50:00Z",
+    "deactivated_utc": "2026-01-02T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000018",
+    "shipment_id": "SHP-2026-000019",
+    "logger_id": "LOG-SHP-2026-000019-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T12:10:00Z",
+    "deactivated_utc": "2026-01-02T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000019",
+    "shipment_id": "SHP-2026-000020",
+    "logger_id": "LOG-SHP-2026-000020-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T13:00:00Z",
+    "deactivated_utc": "2026-01-02T16:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000020",
+    "shipment_id": "SHP-2026-000021",
+    "logger_id": "LOG-SHP-2026-000021-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T14:10:00Z",
+    "deactivated_utc": "2026-01-02T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000021",
+    "shipment_id": "SHP-2026-000022",
+    "logger_id": "LOG-SHP-2026-000022-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:10:00Z",
+    "deactivated_utc": "2026-01-02T19:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000022",
+    "shipment_id": "SHP-2026-000023",
+    "logger_id": "LOG-SHP-2026-000023-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T16:00:00Z",
+    "deactivated_utc": "2026-01-02T19:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000023",
+    "shipment_id": "SHP-2026-000024",
+    "logger_id": "LOG-SHP-2026-000024-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T17:00:00Z",
+    "deactivated_utc": "2026-01-02T21:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000024",
+    "shipment_id": "SHP-2026-000025",
+    "logger_id": "LOG-SHP-2026-000025-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T05:50:00Z",
+    "deactivated_utc": "2026-01-02T09:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000025",
+    "shipment_id": "SHP-2026-000026",
+    "logger_id": "LOG-SHP-2026-000026-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T07:00:00Z",
+    "deactivated_utc": "2026-01-02T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000026",
+    "shipment_id": "SHP-2026-000027",
+    "logger_id": "LOG-SHP-2026-000027-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T08:00:00Z",
+    "deactivated_utc": "2026-01-02T11:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000027",
+    "shipment_id": "SHP-2026-000028",
+    "logger_id": "LOG-SHP-2026-000028-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:00:00Z",
+    "deactivated_utc": "2026-01-02T12:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000028",
+    "shipment_id": "SHP-2026-000029",
+    "logger_id": "LOG-SHP-2026-000029-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:50:00Z",
+    "deactivated_utc": "2026-01-02T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000029",
+    "shipment_id": "SHP-2026-000030",
+    "logger_id": "LOG-SHP-2026-000030-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T11:00:00Z",
+    "deactivated_utc": "2026-01-02T15:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000030",
+    "shipment_id": "SHP-2026-000031",
+    "logger_id": "LOG-SHP-2026-000031-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T12:00:00Z",
+    "deactivated_utc": "2026-01-02T15:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000031",
+    "shipment_id": "SHP-2026-000032",
+    "logger_id": "LOG-SHP-2026-000032-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:10:00Z",
+    "deactivated_utc": "2026-01-02T16:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000032",
+    "shipment_id": "SHP-2026-000033",
+    "logger_id": "LOG-SHP-2026-000033-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:50:00Z",
+    "deactivated_utc": "2026-01-02T16:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000033",
+    "shipment_id": "SHP-2026-000034",
+    "logger_id": "LOG-SHP-2026-000034-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T14:50:00Z",
+    "deactivated_utc": "2026-01-02T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000034",
+    "shipment_id": "SHP-2026-000035",
+    "logger_id": "LOG-SHP-2026-000035-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T16:00:00Z",
+    "deactivated_utc": "2026-01-02T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000035",
+    "shipment_id": "SHP-2026-000036",
+    "logger_id": "LOG-SHP-2026-000036-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T17:10:00Z",
+    "deactivated_utc": "2026-01-02T21:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000036",
+    "shipment_id": "SHP-2026-000037",
+    "logger_id": "LOG-SHP-2026-000037-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T06:00:00Z",
+    "deactivated_utc": "2026-01-02T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000037",
+    "shipment_id": "SHP-2026-000038",
+    "logger_id": "LOG-SHP-2026-000038-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:00:00Z",
+    "deactivated_utc": "2026-01-02T11:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000038",
+    "shipment_id": "SHP-2026-000039",
+    "logger_id": "LOG-SHP-2026-000039-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000039",
+    "shipment_id": "SHP-2026-000040",
+    "logger_id": "LOG-SHP-2026-000040-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:10:00Z",
+    "deactivated_utc": "2026-01-02T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000040",
+    "shipment_id": "SHP-2026-000041",
+    "logger_id": "LOG-SHP-2026-000041-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T10:00:00Z",
+    "deactivated_utc": "2026-01-02T13:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000041",
+    "shipment_id": "SHP-2026-000042",
+    "logger_id": "LOG-SHP-2026-000042-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T11:10:00Z",
+    "deactivated_utc": "2026-01-02T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000042",
+    "shipment_id": "SHP-2026-000043",
+    "logger_id": "LOG-SHP-2026-000043-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T11:50:00Z",
+    "deactivated_utc": "2026-01-02T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000043",
+    "shipment_id": "SHP-2026-000044",
+    "logger_id": "LOG-SHP-2026-000044-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T13:00:00Z",
+    "deactivated_utc": "2026-01-02T16:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000044",
+    "shipment_id": "SHP-2026-000045",
+    "logger_id": "LOG-SHP-2026-000045-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T13:50:00Z",
+    "deactivated_utc": "2026-01-02T18:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000045",
+    "shipment_id": "SHP-2026-000046",
+    "logger_id": "LOG-SHP-2026-000046-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:00:00Z",
+    "deactivated_utc": "2026-01-02T17:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000046",
+    "shipment_id": "SHP-2026-000047",
+    "logger_id": "LOG-SHP-2026-000047-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:50:00Z",
+    "deactivated_utc": "2026-01-02T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000047",
+    "shipment_id": "SHP-2026-000048",
+    "logger_id": "LOG-SHP-2026-000048-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T16:50:00Z",
+    "deactivated_utc": "2026-01-02T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000048",
+    "shipment_id": "SHP-2026-000049",
+    "logger_id": "LOG-SHP-2026-000049-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T05:50:00Z",
+    "deactivated_utc": "2026-01-02T08:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000049",
+    "shipment_id": "SHP-2026-000050",
+    "logger_id": "LOG-SHP-2026-000050-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:00:00Z",
+    "deactivated_utc": "2026-01-02T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000050",
+    "shipment_id": "SHP-2026-000051",
+    "logger_id": "LOG-SHP-2026-000051-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000051",
+    "shipment_id": "SHP-2026-000052",
+    "logger_id": "LOG-SHP-2026-000052-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T09:00:00Z",
+    "deactivated_utc": "2026-01-02T11:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000052",
+    "shipment_id": "SHP-2026-000053",
+    "logger_id": "LOG-SHP-2026-000053-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T10:10:00Z",
+    "deactivated_utc": "2026-01-02T13:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000053",
+    "shipment_id": "SHP-2026-000054",
+    "logger_id": "LOG-SHP-2026-000054-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T11:10:00Z",
+    "deactivated_utc": "2026-01-02T14:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000054",
+    "shipment_id": "SHP-2026-000055",
+    "logger_id": "LOG-SHP-2026-000055-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T12:00:00Z",
+    "deactivated_utc": "2026-01-02T16:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000055",
+    "shipment_id": "SHP-2026-000056",
+    "logger_id": "LOG-SHP-2026-000056-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:10:00Z",
+    "deactivated_utc": "2026-01-02T16:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000056",
+    "shipment_id": "SHP-2026-000057",
+    "logger_id": "LOG-SHP-2026-000057-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T14:00:00Z",
+    "deactivated_utc": "2026-01-02T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000057",
+    "shipment_id": "SHP-2026-000058",
+    "logger_id": "LOG-SHP-2026-000058-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T14:50:00Z",
+    "deactivated_utc": "2026-01-02T18:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000058",
+    "shipment_id": "SHP-2026-000059",
+    "logger_id": "LOG-SHP-2026-000059-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:50:00Z",
+    "deactivated_utc": "2026-01-02T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000059",
+    "shipment_id": "SHP-2026-000060",
+    "logger_id": "LOG-SHP-2026-000060-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T16:50:00Z",
+    "deactivated_utc": "2026-01-02T19:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000060",
+    "shipment_id": "SHP-2026-000061",
+    "logger_id": "LOG-SHP-2026-000061-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T06:10:00Z",
+    "deactivated_utc": "2026-01-02T09:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000061",
+    "shipment_id": "SHP-2026-000062",
+    "logger_id": "LOG-SHP-2026-000062-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T06:50:00Z",
+    "deactivated_utc": "2026-01-02T10:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000062",
+    "shipment_id": "SHP-2026-000063",
+    "logger_id": "LOG-SHP-2026-000063-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T11:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000063",
+    "shipment_id": "SHP-2026-000064",
+    "logger_id": "LOG-SHP-2026-000064-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:10:00Z",
+    "deactivated_utc": "2026-01-02T12:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000064",
+    "shipment_id": "SHP-2026-000065",
+    "logger_id": "LOG-SHP-2026-000065-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T10:10:00Z",
+    "deactivated_utc": "2026-01-02T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000065",
+    "shipment_id": "SHP-2026-000066",
+    "logger_id": "LOG-SHP-2026-000066-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T10:50:00Z",
+    "deactivated_utc": "2026-01-02T15:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000066",
+    "shipment_id": "SHP-2026-000067",
+    "logger_id": "LOG-SHP-2026-000067-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T12:00:00Z",
+    "deactivated_utc": "2026-01-02T16:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000067",
+    "shipment_id": "SHP-2026-000068",
+    "logger_id": "LOG-SHP-2026-000068-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:00:00Z",
+    "deactivated_utc": "2026-01-02T17:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000068",
+    "shipment_id": "SHP-2026-000069",
+    "logger_id": "LOG-SHP-2026-000069-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:50:00Z",
+    "deactivated_utc": "2026-01-02T17:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000069",
+    "shipment_id": "SHP-2026-000070",
+    "logger_id": "LOG-SHP-2026-000070-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T14:50:00Z",
+    "deactivated_utc": "2026-01-02T18:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000070",
+    "shipment_id": "SHP-2026-000071",
+    "logger_id": "LOG-SHP-2026-000071-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T16:00:00Z",
+    "deactivated_utc": "2026-01-02T19:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000071",
+    "shipment_id": "SHP-2026-000072",
+    "logger_id": "LOG-SHP-2026-000072-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T17:10:00Z",
+    "deactivated_utc": "2026-01-02T19:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000072",
+    "shipment_id": "SHP-2026-000073",
+    "logger_id": "LOG-SHP-2026-000073-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T05:50:00Z",
+    "deactivated_utc": "2026-01-02T10:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000073",
+    "shipment_id": "SHP-2026-000074",
+    "logger_id": "LOG-SHP-2026-000074-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T06:50:00Z",
+    "deactivated_utc": "2026-01-02T09:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000074",
+    "shipment_id": "SHP-2026-000075",
+    "logger_id": "LOG-SHP-2026-000075-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T08:10:00Z",
+    "deactivated_utc": "2026-01-02T10:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000075",
+    "shipment_id": "SHP-2026-000076",
+    "logger_id": "LOG-SHP-2026-000076-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T09:00:00Z",
+    "deactivated_utc": "2026-01-02T11:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000076",
+    "shipment_id": "SHP-2026-000077",
+    "logger_id": "LOG-SHP-2026-000077-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T10:10:00Z",
+    "deactivated_utc": "2026-01-02T14:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000077",
+    "shipment_id": "SHP-2026-000078",
+    "logger_id": "LOG-SHP-2026-000078-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T11:00:00Z",
+    "deactivated_utc": "2026-01-02T15:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000078",
+    "shipment_id": "SHP-2026-000079",
+    "logger_id": "LOG-SHP-2026-000079-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T11:50:00Z",
+    "deactivated_utc": "2026-01-02T14:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000079",
+    "shipment_id": "SHP-2026-000080",
+    "logger_id": "LOG-SHP-2026-000080-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T13:00:00Z",
+    "deactivated_utc": "2026-01-02T15:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000080",
+    "shipment_id": "SHP-2026-000081",
+    "logger_id": "LOG-SHP-2026-000081-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T14:00:00Z",
+    "deactivated_utc": "2026-01-02T16:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000081",
+    "shipment_id": "SHP-2026-000082",
+    "logger_id": "LOG-SHP-2026-000082-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:00:00Z",
+    "deactivated_utc": "2026-01-02T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000082",
+    "shipment_id": "SHP-2026-000083",
+    "logger_id": "LOG-SHP-2026-000083-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T15:50:00Z",
+    "deactivated_utc": "2026-01-02T20:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000083",
+    "shipment_id": "SHP-2026-000084",
+    "logger_id": "LOG-SHP-2026-000084-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T17:00:00Z",
+    "deactivated_utc": "2026-01-02T19:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000084",
+    "shipment_id": "SHP-2026-000085",
+    "logger_id": "LOG-SHP-2026-000085-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T06:10:00Z",
+    "deactivated_utc": "2026-01-02T10:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000085",
+    "shipment_id": "SHP-2026-000086",
+    "logger_id": "LOG-SHP-2026-000086-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T07:00:00Z",
+    "deactivated_utc": "2026-01-02T10:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000086",
+    "shipment_id": "SHP-2026-000087",
+    "logger_id": "LOG-SHP-2026-000087-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T10:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000087",
+    "shipment_id": "SHP-2026-000088",
+    "logger_id": "LOG-SHP-2026-000088-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:00:00Z",
+    "deactivated_utc": "2026-01-02T11:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000088",
+    "shipment_id": "SHP-2026-000089",
+    "logger_id": "LOG-SHP-2026-000089-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T09:50:00Z",
+    "deactivated_utc": "2026-01-02T13:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000089",
+    "shipment_id": "SHP-2026-000090",
+    "logger_id": "LOG-SHP-2026-000090-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T10:50:00Z",
+    "deactivated_utc": "2026-01-02T13:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000090",
+    "shipment_id": "SHP-2026-000091",
+    "logger_id": "LOG-SHP-2026-000091-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T12:10:00Z",
+    "deactivated_utc": "2026-01-02T14:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000091",
+    "shipment_id": "SHP-2026-000092",
+    "logger_id": "LOG-SHP-2026-000092-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T12:50:00Z",
+    "deactivated_utc": "2026-01-02T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000092",
+    "shipment_id": "SHP-2026-000093",
+    "logger_id": "LOG-SHP-2026-000093-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T14:00:00Z",
+    "deactivated_utc": "2026-01-02T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000093",
+    "shipment_id": "SHP-2026-000094",
+    "logger_id": "LOG-SHP-2026-000094-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T15:00:00Z",
+    "deactivated_utc": "2026-01-02T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000094",
+    "shipment_id": "SHP-2026-000095",
+    "logger_id": "LOG-SHP-2026-000095-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T15:50:00Z",
+    "deactivated_utc": "2026-01-02T18:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000095",
+    "shipment_id": "SHP-2026-000096",
+    "logger_id": "LOG-SHP-2026-000096-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T16:50:00Z",
+    "deactivated_utc": "2026-01-02T20:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000096",
+    "shipment_id": "SHP-2026-000097",
+    "logger_id": "LOG-SHP-2026-000097-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T05:50:00Z",
+    "deactivated_utc": "2026-01-02T09:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000097",
+    "shipment_id": "SHP-2026-000098",
+    "logger_id": "LOG-SHP-2026-000098-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T06:50:00Z",
+    "deactivated_utc": "2026-01-02T09:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000098",
+    "shipment_id": "SHP-2026-000099",
+    "logger_id": "LOG-SHP-2026-000099-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-02T07:50:00Z",
+    "deactivated_utc": "2026-01-02T10:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000099",
+    "shipment_id": "SHP-2026-000100",
+    "logger_id": "LOG-SHP-2026-000100-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-02T08:50:00Z",
+    "deactivated_utc": "2026-01-02T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000100",
+    "shipment_id": "SHP-2026-000101",
+    "logger_id": "LOG-SHP-2026-000001-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T06:10:00Z",
+    "deactivated_utc": "2026-01-03T08:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000101",
+    "shipment_id": "SHP-2026-000102",
+    "logger_id": "LOG-SHP-2026-000002-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T07:10:00Z",
+    "deactivated_utc": "2026-01-03T11:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000102",
+    "shipment_id": "SHP-2026-000103",
+    "logger_id": "LOG-SHP-2026-000003-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T08:10:00Z",
+    "deactivated_utc": "2026-01-03T11:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000103",
+    "shipment_id": "SHP-2026-000104",
+    "logger_id": "LOG-SHP-2026-000004-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T09:00:00Z",
+    "deactivated_utc": "2026-01-03T11:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000104",
+    "shipment_id": "SHP-2026-000105",
+    "logger_id": "LOG-SHP-2026-000005-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T10:10:00Z",
+    "deactivated_utc": "2026-01-03T14:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000105",
+    "shipment_id": "SHP-2026-000106",
+    "logger_id": "LOG-SHP-2026-000006-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T11:00:00Z",
+    "deactivated_utc": "2026-01-03T14:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000106",
+    "shipment_id": "SHP-2026-000107",
+    "logger_id": "LOG-SHP-2026-000007-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T12:10:00Z",
+    "deactivated_utc": "2026-01-03T14:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000107",
+    "shipment_id": "SHP-2026-000108",
+    "logger_id": "LOG-SHP-2026-000008-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T13:00:00Z",
+    "deactivated_utc": "2026-01-03T16:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000108",
+    "shipment_id": "SHP-2026-000109",
+    "logger_id": "LOG-SHP-2026-000009-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T14:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000109",
+    "shipment_id": "SHP-2026-000110",
+    "logger_id": "LOG-SHP-2026-000010-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T15:10:00Z",
+    "deactivated_utc": "2026-01-03T17:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000110",
+    "shipment_id": "SHP-2026-000111",
+    "logger_id": "LOG-SHP-2026-000011-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:50:00Z",
+    "deactivated_utc": "2026-01-03T20:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000111",
+    "shipment_id": "SHP-2026-000112",
+    "logger_id": "LOG-SHP-2026-000012-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T17:00:00Z",
+    "deactivated_utc": "2026-01-03T20:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000112",
+    "shipment_id": "SHP-2026-000113",
+    "logger_id": "LOG-SHP-2026-000013-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T06:00:00Z",
+    "deactivated_utc": "2026-01-03T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000113",
+    "shipment_id": "SHP-2026-000114",
+    "logger_id": "LOG-SHP-2026-000014-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T06:50:00Z",
+    "deactivated_utc": "2026-01-03T09:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000114",
+    "shipment_id": "SHP-2026-000115",
+    "logger_id": "LOG-SHP-2026-000015-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T08:10:00Z",
+    "deactivated_utc": "2026-01-03T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000115",
+    "shipment_id": "SHP-2026-000116",
+    "logger_id": "LOG-SHP-2026-000016-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T09:10:00Z",
+    "deactivated_utc": "2026-01-03T13:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000116",
+    "shipment_id": "SHP-2026-000117",
+    "logger_id": "LOG-SHP-2026-000017-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T09:50:00Z",
+    "deactivated_utc": "2026-01-03T13:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000117",
+    "shipment_id": "SHP-2026-000119",
+    "logger_id": "LOG-SHP-2026-000019-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T12:10:00Z",
+    "deactivated_utc": "2026-01-03T14:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000118",
+    "shipment_id": "SHP-2026-000120",
+    "logger_id": "LOG-SHP-2026-000020-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T13:00:00Z",
+    "deactivated_utc": "2026-01-03T17:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000119",
+    "shipment_id": "SHP-2026-000121",
+    "logger_id": "LOG-SHP-2026-000021-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T14:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000120",
+    "shipment_id": "SHP-2026-000122",
+    "logger_id": "LOG-SHP-2026-000022-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000121",
+    "shipment_id": "SHP-2026-000123",
+    "logger_id": "LOG-SHP-2026-000023-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:50:00Z",
+    "deactivated_utc": "2026-01-03T18:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000122",
+    "shipment_id": "SHP-2026-000124",
+    "logger_id": "LOG-SHP-2026-000024-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T17:10:00Z",
+    "deactivated_utc": "2026-01-03T20:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000123",
+    "shipment_id": "SHP-2026-000125",
+    "logger_id": "LOG-SHP-2026-000025-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T06:10:00Z",
+    "deactivated_utc": "2026-01-03T09:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000124",
+    "shipment_id": "SHP-2026-000126",
+    "logger_id": "LOG-SHP-2026-000026-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T07:00:00Z",
+    "deactivated_utc": "2026-01-03T09:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000125",
+    "shipment_id": "SHP-2026-000127",
+    "logger_id": "LOG-SHP-2026-000027-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T07:50:00Z",
+    "deactivated_utc": "2026-01-03T11:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000126",
+    "shipment_id": "SHP-2026-000128",
+    "logger_id": "LOG-SHP-2026-000028-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T09:00:00Z",
+    "deactivated_utc": "2026-01-03T11:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000127",
+    "shipment_id": "SHP-2026-000129",
+    "logger_id": "LOG-SHP-2026-000029-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T09:50:00Z",
+    "deactivated_utc": "2026-01-03T13:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000128",
+    "shipment_id": "SHP-2026-000130",
+    "logger_id": "LOG-SHP-2026-000030-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T11:10:00Z",
+    "deactivated_utc": "2026-01-03T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000129",
+    "shipment_id": "SHP-2026-000131",
+    "logger_id": "LOG-SHP-2026-000031-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T11:50:00Z",
+    "deactivated_utc": "2026-01-03T14:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000130",
+    "shipment_id": "SHP-2026-000132",
+    "logger_id": "LOG-SHP-2026-000032-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T13:10:00Z",
+    "deactivated_utc": "2026-01-03T16:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000131",
+    "shipment_id": "SHP-2026-000133",
+    "logger_id": "LOG-SHP-2026-000033-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T13:50:00Z",
+    "deactivated_utc": "2026-01-03T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000132",
+    "shipment_id": "SHP-2026-000134",
+    "logger_id": "LOG-SHP-2026-000034-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:10:00Z",
+    "deactivated_utc": "2026-01-03T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000133",
+    "shipment_id": "SHP-2026-000135",
+    "logger_id": "LOG-SHP-2026-000035-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000134",
+    "shipment_id": "SHP-2026-000136",
+    "logger_id": "LOG-SHP-2026-000036-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:50:00Z",
+    "deactivated_utc": "2026-01-03T20:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000135",
+    "shipment_id": "SHP-2026-000137",
+    "logger_id": "LOG-SHP-2026-000037-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T06:10:00Z",
+    "deactivated_utc": "2026-01-03T08:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000136",
+    "shipment_id": "SHP-2026-000138",
+    "logger_id": "LOG-SHP-2026-000038-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T06:50:00Z",
+    "deactivated_utc": "2026-01-03T11:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000137",
+    "shipment_id": "SHP-2026-000139",
+    "logger_id": "LOG-SHP-2026-000039-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T08:00:00Z",
+    "deactivated_utc": "2026-01-03T10:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000138",
+    "shipment_id": "SHP-2026-000140",
+    "logger_id": "LOG-SHP-2026-000040-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T08:50:00Z",
+    "deactivated_utc": "2026-01-03T11:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000139",
+    "shipment_id": "SHP-2026-000141",
+    "logger_id": "LOG-SHP-2026-000041-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T10:00:00Z",
+    "deactivated_utc": "2026-01-03T14:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000140",
+    "shipment_id": "SHP-2026-000142",
+    "logger_id": "LOG-SHP-2026-000042-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T11:00:00Z",
+    "deactivated_utc": "2026-01-03T14:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000141",
+    "shipment_id": "SHP-2026-000143",
+    "logger_id": "LOG-SHP-2026-000043-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T12:10:00Z",
+    "deactivated_utc": "2026-01-03T16:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000142",
+    "shipment_id": "SHP-2026-000144",
+    "logger_id": "LOG-SHP-2026-000044-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T13:00:00Z",
+    "deactivated_utc": "2026-01-03T16:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000143",
+    "shipment_id": "SHP-2026-000145",
+    "logger_id": "LOG-SHP-2026-000045-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T13:50:00Z",
+    "deactivated_utc": "2026-01-03T18:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000144",
+    "shipment_id": "SHP-2026-000146",
+    "logger_id": "LOG-SHP-2026-000046-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000145",
+    "shipment_id": "SHP-2026-000147",
+    "logger_id": "LOG-SHP-2026-000047-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T16:10:00Z",
+    "deactivated_utc": "2026-01-03T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000146",
+    "shipment_id": "SHP-2026-000148",
+    "logger_id": "LOG-SHP-2026-000048-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:50:00Z",
+    "deactivated_utc": "2026-01-03T21:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000147",
+    "shipment_id": "SHP-2026-000149",
+    "logger_id": "LOG-SHP-2026-000049-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T06:10:00Z",
+    "deactivated_utc": "2026-01-03T10:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000148",
+    "shipment_id": "SHP-2026-000150",
+    "logger_id": "LOG-SHP-2026-000050-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T06:50:00Z",
+    "deactivated_utc": "2026-01-03T09:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000149",
+    "shipment_id": "SHP-2026-000151",
+    "logger_id": "LOG-SHP-2026-000051-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T07:50:00Z",
+    "deactivated_utc": "2026-01-03T12:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000150",
+    "shipment_id": "SHP-2026-000152",
+    "logger_id": "LOG-SHP-2026-000052-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T09:10:00Z",
+    "deactivated_utc": "2026-01-03T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000151",
+    "shipment_id": "SHP-2026-000153",
+    "logger_id": "LOG-SHP-2026-000053-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T10:00:00Z",
+    "deactivated_utc": "2026-01-03T12:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000152",
+    "shipment_id": "SHP-2026-000154",
+    "logger_id": "LOG-SHP-2026-000054-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T10:50:00Z",
+    "deactivated_utc": "2026-01-03T14:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000153",
+    "shipment_id": "SHP-2026-000155",
+    "logger_id": "LOG-SHP-2026-000055-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T11:50:00Z",
+    "deactivated_utc": "2026-01-03T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000154",
+    "shipment_id": "SHP-2026-000156",
+    "logger_id": "LOG-SHP-2026-000056-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T13:00:00Z",
+    "deactivated_utc": "2026-01-03T15:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000155",
+    "shipment_id": "SHP-2026-000157",
+    "logger_id": "LOG-SHP-2026-000057-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T14:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000156",
+    "shipment_id": "SHP-2026-000158",
+    "logger_id": "LOG-SHP-2026-000058-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T14:50:00Z",
+    "deactivated_utc": "2026-01-03T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000157",
+    "shipment_id": "SHP-2026-000159",
+    "logger_id": "LOG-SHP-2026-000059-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:10:00Z",
+    "deactivated_utc": "2026-01-03T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000158",
+    "shipment_id": "SHP-2026-000160",
+    "logger_id": "LOG-SHP-2026-000060-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:50:00Z",
+    "deactivated_utc": "2026-01-03T19:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000159",
+    "shipment_id": "SHP-2026-000161",
+    "logger_id": "LOG-SHP-2026-000061-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T05:50:00Z",
+    "deactivated_utc": "2026-01-03T08:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000160",
+    "shipment_id": "SHP-2026-000162",
+    "logger_id": "LOG-SHP-2026-000062-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T06:50:00Z",
+    "deactivated_utc": "2026-01-03T10:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000161",
+    "shipment_id": "SHP-2026-000163",
+    "logger_id": "LOG-SHP-2026-000063-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T08:00:00Z",
+    "deactivated_utc": "2026-01-03T10:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000162",
+    "shipment_id": "SHP-2026-000164",
+    "logger_id": "LOG-SHP-2026-000064-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T09:10:00Z",
+    "deactivated_utc": "2026-01-03T13:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000163",
+    "shipment_id": "SHP-2026-000165",
+    "logger_id": "LOG-SHP-2026-000065-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T10:00:00Z",
+    "deactivated_utc": "2026-01-03T14:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000164",
+    "shipment_id": "SHP-2026-000166",
+    "logger_id": "LOG-SHP-2026-000066-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T11:10:00Z",
+    "deactivated_utc": "2026-01-03T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000165",
+    "shipment_id": "SHP-2026-000167",
+    "logger_id": "LOG-SHP-2026-000067-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T12:10:00Z",
+    "deactivated_utc": "2026-01-03T15:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000166",
+    "shipment_id": "SHP-2026-000168",
+    "logger_id": "LOG-SHP-2026-000068-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T12:50:00Z",
+    "deactivated_utc": "2026-01-03T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000167",
+    "shipment_id": "SHP-2026-000169",
+    "logger_id": "LOG-SHP-2026-000069-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T13:50:00Z",
+    "deactivated_utc": "2026-01-03T17:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000168",
+    "shipment_id": "SHP-2026-000170",
+    "logger_id": "LOG-SHP-2026-000070-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T15:10:00Z",
+    "deactivated_utc": "2026-01-03T19:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000169",
+    "shipment_id": "SHP-2026-000171",
+    "logger_id": "LOG-SHP-2026-000071-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T16:00:00Z",
+    "deactivated_utc": "2026-01-03T18:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000170",
+    "shipment_id": "SHP-2026-000172",
+    "logger_id": "LOG-SHP-2026-000072-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:50:00Z",
+    "deactivated_utc": "2026-01-03T20:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000171",
+    "shipment_id": "SHP-2026-000173",
+    "logger_id": "LOG-SHP-2026-000073-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T05:50:00Z",
+    "deactivated_utc": "2026-01-03T10:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000172",
+    "shipment_id": "SHP-2026-000174",
+    "logger_id": "LOG-SHP-2026-000074-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T07:10:00Z",
+    "deactivated_utc": "2026-01-03T11:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000173",
+    "shipment_id": "SHP-2026-000175",
+    "logger_id": "LOG-SHP-2026-000075-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T08:10:00Z",
+    "deactivated_utc": "2026-01-03T10:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000174",
+    "shipment_id": "SHP-2026-000176",
+    "logger_id": "LOG-SHP-2026-000076-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T09:00:00Z",
+    "deactivated_utc": "2026-01-03T13:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000175",
+    "shipment_id": "SHP-2026-000177",
+    "logger_id": "LOG-SHP-2026-000077-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T09:50:00Z",
+    "deactivated_utc": "2026-01-03T13:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000176",
+    "shipment_id": "SHP-2026-000178",
+    "logger_id": "LOG-SHP-2026-000078-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T11:10:00Z",
+    "deactivated_utc": "2026-01-03T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000177",
+    "shipment_id": "SHP-2026-000179",
+    "logger_id": "LOG-SHP-2026-000079-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T12:10:00Z",
+    "deactivated_utc": "2026-01-03T15:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000178",
+    "shipment_id": "SHP-2026-000180",
+    "logger_id": "LOG-SHP-2026-000080-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T13:10:00Z",
+    "deactivated_utc": "2026-01-03T16:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000179",
+    "shipment_id": "SHP-2026-000181",
+    "logger_id": "LOG-SHP-2026-000081-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T13:50:00Z",
+    "deactivated_utc": "2026-01-03T18:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000180",
+    "shipment_id": "SHP-2026-000182",
+    "logger_id": "LOG-SHP-2026-000082-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:10:00Z",
+    "deactivated_utc": "2026-01-03T19:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000181",
+    "shipment_id": "SHP-2026-000183",
+    "logger_id": "LOG-SHP-2026-000083-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T16:10:00Z",
+    "deactivated_utc": "2026-01-03T20:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000182",
+    "shipment_id": "SHP-2026-000184",
+    "logger_id": "LOG-SHP-2026-000084-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T17:10:00Z",
+    "deactivated_utc": "2026-01-03T19:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000183",
+    "shipment_id": "SHP-2026-000185",
+    "logger_id": "LOG-SHP-2026-000085-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T05:50:00Z",
+    "deactivated_utc": "2026-01-03T09:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000184",
+    "shipment_id": "SHP-2026-000186",
+    "logger_id": "LOG-SHP-2026-000086-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T07:10:00Z",
+    "deactivated_utc": "2026-01-03T10:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000185",
+    "shipment_id": "SHP-2026-000187",
+    "logger_id": "LOG-SHP-2026-000087-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T08:00:00Z",
+    "deactivated_utc": "2026-01-03T11:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000186",
+    "shipment_id": "SHP-2026-000188",
+    "logger_id": "LOG-SHP-2026-000088-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T09:00:00Z",
+    "deactivated_utc": "2026-01-03T12:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000187",
+    "shipment_id": "SHP-2026-000189",
+    "logger_id": "LOG-SHP-2026-000089-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T10:00:00Z",
+    "deactivated_utc": "2026-01-03T14:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000188",
+    "shipment_id": "SHP-2026-000190",
+    "logger_id": "LOG-SHP-2026-000090-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T11:00:00Z",
+    "deactivated_utc": "2026-01-03T13:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000189",
+    "shipment_id": "SHP-2026-000191",
+    "logger_id": "LOG-SHP-2026-000091-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T12:10:00Z",
+    "deactivated_utc": "2026-01-03T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000190",
+    "shipment_id": "SHP-2026-000192",
+    "logger_id": "LOG-SHP-2026-000092-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T12:50:00Z",
+    "deactivated_utc": "2026-01-03T17:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000191",
+    "shipment_id": "SHP-2026-000193",
+    "logger_id": "LOG-SHP-2026-000093-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T14:10:00Z",
+    "deactivated_utc": "2026-01-03T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000192",
+    "shipment_id": "SHP-2026-000194",
+    "logger_id": "LOG-SHP-2026-000094-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T15:00:00Z",
+    "deactivated_utc": "2026-01-03T17:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000193",
+    "shipment_id": "SHP-2026-000195",
+    "logger_id": "LOG-SHP-2026-000095-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T16:00:00Z",
+    "deactivated_utc": "2026-01-03T19:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000194",
+    "shipment_id": "SHP-2026-000196",
+    "logger_id": "LOG-SHP-2026-000096-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T17:10:00Z",
+    "deactivated_utc": "2026-01-03T19:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000195",
+    "shipment_id": "SHP-2026-000197",
+    "logger_id": "LOG-SHP-2026-000097-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T05:50:00Z",
+    "deactivated_utc": "2026-01-03T08:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000196",
+    "shipment_id": "SHP-2026-000198",
+    "logger_id": "LOG-SHP-2026-000098-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T07:10:00Z",
+    "deactivated_utc": "2026-01-03T10:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000197",
+    "shipment_id": "SHP-2026-000199",
+    "logger_id": "LOG-SHP-2026-000099-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-03T08:10:00Z",
+    "deactivated_utc": "2026-01-03T12:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000198",
+    "shipment_id": "SHP-2026-000200",
+    "logger_id": "LOG-SHP-2026-000100-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-03T09:00:00Z",
+    "deactivated_utc": "2026-01-03T13:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000199",
+    "shipment_id": "SHP-2026-000201",
+    "logger_id": "LOG-SHP-2026-000001-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T06:00:00Z",
+    "deactivated_utc": "2026-01-04T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000200",
+    "shipment_id": "SHP-2026-000202",
+    "logger_id": "LOG-SHP-2026-000002-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T07:00:00Z",
+    "deactivated_utc": "2026-01-04T09:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000201",
+    "shipment_id": "SHP-2026-000203",
+    "logger_id": "LOG-SHP-2026-000003-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T08:10:00Z",
+    "deactivated_utc": "2026-01-04T10:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000202",
+    "shipment_id": "SHP-2026-000204",
+    "logger_id": "LOG-SHP-2026-000004-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T08:50:00Z",
+    "deactivated_utc": "2026-01-04T13:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000203",
+    "shipment_id": "SHP-2026-000205",
+    "logger_id": "LOG-SHP-2026-000005-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T10:10:00Z",
+    "deactivated_utc": "2026-01-04T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000204",
+    "shipment_id": "SHP-2026-000206",
+    "logger_id": "LOG-SHP-2026-000006-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T11:10:00Z",
+    "deactivated_utc": "2026-01-04T15:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000205",
+    "shipment_id": "SHP-2026-000207",
+    "logger_id": "LOG-SHP-2026-000007-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T12:10:00Z",
+    "deactivated_utc": "2026-01-04T16:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000206",
+    "shipment_id": "SHP-2026-000208",
+    "logger_id": "LOG-SHP-2026-000008-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T12:50:00Z",
+    "deactivated_utc": "2026-01-04T15:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000207",
+    "shipment_id": "SHP-2026-000209",
+    "logger_id": "LOG-SHP-2026-000009-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T14:00:00Z",
+    "deactivated_utc": "2026-01-04T16:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000208",
+    "shipment_id": "SHP-2026-000210",
+    "logger_id": "LOG-SHP-2026-000010-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T14:50:00Z",
+    "deactivated_utc": "2026-01-04T17:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000209",
+    "shipment_id": "SHP-2026-000211",
+    "logger_id": "LOG-SHP-2026-000011-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T16:10:00Z",
+    "deactivated_utc": "2026-01-04T20:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000210",
+    "shipment_id": "SHP-2026-000212",
+    "logger_id": "LOG-SHP-2026-000012-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T16:50:00Z",
+    "deactivated_utc": "2026-01-04T20:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000211",
+    "shipment_id": "SHP-2026-000213",
+    "logger_id": "LOG-SHP-2026-000013-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T06:10:00Z",
+    "deactivated_utc": "2026-01-04T09:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000212",
+    "shipment_id": "SHP-2026-000214",
+    "logger_id": "LOG-SHP-2026-000014-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T07:10:00Z",
+    "deactivated_utc": "2026-01-04T10:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000213",
+    "shipment_id": "SHP-2026-000215",
+    "logger_id": "LOG-SHP-2026-000015-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T08:00:00Z",
+    "deactivated_utc": "2026-01-04T10:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000214",
+    "shipment_id": "SHP-2026-000216",
+    "logger_id": "LOG-SHP-2026-000016-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T08:50:00Z",
+    "deactivated_utc": "2026-01-04T13:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000215",
+    "shipment_id": "SHP-2026-000217",
+    "logger_id": "LOG-SHP-2026-000017-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T09:50:00Z",
+    "deactivated_utc": "2026-01-04T14:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000216",
+    "shipment_id": "SHP-2026-000219",
+    "logger_id": "LOG-SHP-2026-000019-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T12:00:00Z",
+    "deactivated_utc": "2026-01-04T14:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000217",
+    "shipment_id": "SHP-2026-000220",
+    "logger_id": "LOG-SHP-2026-000020-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T13:10:00Z",
+    "deactivated_utc": "2026-01-04T15:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000218",
+    "shipment_id": "SHP-2026-000221",
+    "logger_id": "LOG-SHP-2026-000021-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T14:10:00Z",
+    "deactivated_utc": "2026-01-04T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000219",
+    "shipment_id": "SHP-2026-000222",
+    "logger_id": "LOG-SHP-2026-000022-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T15:00:00Z",
+    "deactivated_utc": "2026-01-04T18:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000220",
+    "shipment_id": "SHP-2026-000223",
+    "logger_id": "LOG-SHP-2026-000023-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T16:00:00Z",
+    "deactivated_utc": "2026-01-04T20:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000221",
+    "shipment_id": "SHP-2026-000224",
+    "logger_id": "LOG-SHP-2026-000024-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T16:50:00Z",
+    "deactivated_utc": "2026-01-04T19:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000222",
+    "shipment_id": "SHP-2026-000225",
+    "logger_id": "LOG-SHP-2026-000025-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T06:10:00Z",
+    "deactivated_utc": "2026-01-04T10:00:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000223",
+    "shipment_id": "SHP-2026-000226",
+    "logger_id": "LOG-SHP-2026-000026-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T07:00:00Z",
+    "deactivated_utc": "2026-01-04T10:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000224",
+    "shipment_id": "SHP-2026-000227",
+    "logger_id": "LOG-SHP-2026-000027-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T08:10:00Z",
+    "deactivated_utc": "2026-01-04T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000225",
+    "shipment_id": "SHP-2026-000228",
+    "logger_id": "LOG-SHP-2026-000028-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T08:50:00Z",
+    "deactivated_utc": "2026-01-04T13:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000226",
+    "shipment_id": "SHP-2026-000229",
+    "logger_id": "LOG-SHP-2026-000029-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T10:10:00Z",
+    "deactivated_utc": "2026-01-04T13:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000227",
+    "shipment_id": "SHP-2026-000230",
+    "logger_id": "LOG-SHP-2026-000030-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T11:10:00Z",
+    "deactivated_utc": "2026-01-04T15:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000228",
+    "shipment_id": "SHP-2026-000231",
+    "logger_id": "LOG-SHP-2026-000031-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T11:50:00Z",
+    "deactivated_utc": "2026-01-04T14:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000229",
+    "shipment_id": "SHP-2026-000232",
+    "logger_id": "LOG-SHP-2026-000032-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T12:50:00Z",
+    "deactivated_utc": "2026-01-04T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000230",
+    "shipment_id": "SHP-2026-000233",
+    "logger_id": "LOG-SHP-2026-000033-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T13:50:00Z",
+    "deactivated_utc": "2026-01-04T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000231",
+    "shipment_id": "SHP-2026-000234",
+    "logger_id": "LOG-SHP-2026-000034-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T14:50:00Z",
+    "deactivated_utc": "2026-01-04T17:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000232",
+    "shipment_id": "SHP-2026-000235",
+    "logger_id": "LOG-SHP-2026-000035-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T16:00:00Z",
+    "deactivated_utc": "2026-01-04T19:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000233",
+    "shipment_id": "SHP-2026-000236",
+    "logger_id": "LOG-SHP-2026-000036-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T17:10:00Z",
+    "deactivated_utc": "2026-01-04T19:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000234",
+    "shipment_id": "SHP-2026-000237",
+    "logger_id": "LOG-SHP-2026-000037-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T05:50:00Z",
+    "deactivated_utc": "2026-01-04T08:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000235",
+    "shipment_id": "SHP-2026-000238",
+    "logger_id": "LOG-SHP-2026-000038-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T07:00:00Z",
+    "deactivated_utc": "2026-01-04T11:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000236",
+    "shipment_id": "SHP-2026-000239",
+    "logger_id": "LOG-SHP-2026-000039-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T08:00:00Z",
+    "deactivated_utc": "2026-01-04T11:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000237",
+    "shipment_id": "SHP-2026-000240",
+    "logger_id": "LOG-SHP-2026-000040-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T09:10:00Z",
+    "deactivated_utc": "2026-01-04T11:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000238",
+    "shipment_id": "SHP-2026-000241",
+    "logger_id": "LOG-SHP-2026-000041-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T10:10:00Z",
+    "deactivated_utc": "2026-01-04T12:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000239",
+    "shipment_id": "SHP-2026-000242",
+    "logger_id": "LOG-SHP-2026-000042-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T11:00:00Z",
+    "deactivated_utc": "2026-01-04T13:50:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000240",
+    "shipment_id": "SHP-2026-000243",
+    "logger_id": "LOG-SHP-2026-000043-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T12:00:00Z",
+    "deactivated_utc": "2026-01-04T16:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000241",
+    "shipment_id": "SHP-2026-000244",
+    "logger_id": "LOG-SHP-2026-000044-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T12:50:00Z",
+    "deactivated_utc": "2026-01-04T16:10:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000242",
+    "shipment_id": "SHP-2026-000245",
+    "logger_id": "LOG-SHP-2026-000045-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T14:10:00Z",
+    "deactivated_utc": "2026-01-04T18:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000243",
+    "shipment_id": "SHP-2026-000246",
+    "logger_id": "LOG-SHP-2026-000046-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T15:00:00Z",
+    "deactivated_utc": "2026-01-04T17:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000244",
+    "shipment_id": "SHP-2026-000247",
+    "logger_id": "LOG-SHP-2026-000047-01",
+    "sensor_position": "PAYLOAD_CORE",
+    "activated_utc": "2026-01-04T15:50:00Z",
+    "deactivated_utc": "2026-01-04T18:40:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000245",
+    "shipment_id": "SHP-2026-000248",
+    "logger_id": "LOG-SHP-2026-000048-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T17:10:00Z",
+    "deactivated_utc": "2026-01-04T19:30:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000246",
+    "shipment_id": "SHP-2026-000249",
+    "logger_id": "LOG-SHP-2026-000049-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T06:00:00Z",
+    "deactivated_utc": "2026-01-04T08:20:00Z",
+    "assignment_status": "COMPLETED"
+  },
+  {
+    "assignment_id": "ASSGN-2026-000247",
+    "shipment_id": "SHP-2026-000250",
+    "logger_id": "LOG-SHP-2026-000050-01",
+    "sensor_position": "PAYLOAD_TOP_CORNER",
+    "activated_utc": "2026-01-04T07:10:00Z",
+    "deactivated_utc": "2026-01-04T11:30:00Z",
+    "assignment_status": "COMPLETED"
+  }
+]

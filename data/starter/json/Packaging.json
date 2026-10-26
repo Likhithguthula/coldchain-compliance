@@ -1,0 +1,112 @@
+[
+  {
+    "packaging_id": "PKG-2026-0001",
+    "model_name": "Envirotainer RKN e1 Active Compressor ULD",
+    "packaging_type": "ACTIVE_ULD_COMPRESSOR",
+    "target_regime": "REFRIGERATED",
+    "validated_hold_hours": 120,
+    "insulation_r_value": 32.5,
+    "payload_capacity_liters": 1100.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0002",
+    "model_name": "CSafe RAP Active Thermal Pallet Container",
+    "packaging_type": "ACTIVE_ULD_COMPRESSOR",
+    "target_regime": "REFRIGERATED",
+    "validated_hold_hours": 144,
+    "insulation_r_value": 36.0,
+    "payload_capacity_liters": 1450.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0003",
+    "model_name": "CryoVault Dry-Ice Sublimation Shipper 96h",
+    "packaging_type": "DRY_ICE_SHIPPER",
+    "target_regime": "ULT_DEEP_FREEZE",
+    "validated_hold_hours": 96,
+    "insulation_r_value": 42.0,
+    "payload_capacity_liters": 65.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0004",
+    "model_name": "CryoBox Pelton-VIP UltraDeep Dry Ice Parcel",
+    "packaging_type": "DRY_ICE_SHIPPER",
+    "target_regime": "ULT_DEEP_FREEZE",
+    "validated_hold_hours": 120,
+    "insulation_r_value": 44.5,
+    "payload_capacity_liters": 40.0,
+    "reusable": false,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0005",
+    "model_name": "Va-Q-tec va-Q-tainer PCM Phase-Change -20C",
+    "packaging_type": "PASSIVE_PCM_VIP",
+    "target_regime": "FROZEN",
+    "validated_hold_hours": 108,
+    "insulation_r_value": 38.0,
+    "payload_capacity_liters": 450.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0006",
+    "model_name": "Softbox Silverpod PCM Frozen Pallet Shipper",
+    "packaging_type": "PASSIVE_PCM_VIP",
+    "target_regime": "FROZEN",
+    "validated_hold_hours": 96,
+    "insulation_r_value": 34.0,
+    "payload_capacity_liters": 320.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0007",
+    "model_name": "Sonoco ThermoSafe Greenbox 2-8C VIP Parcel",
+    "packaging_type": "PASSIVE_PCM_VIP",
+    "target_regime": "REFRIGERATED",
+    "validated_hold_hours": 72,
+    "insulation_r_value": 28.5,
+    "payload_capacity_liters": 50.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0008",
+    "model_name": "Peli BioThermal Cr\u0113do Cube CRT 15-25C",
+    "packaging_type": "PASSIVE_PCM_VIP",
+    "target_regime": "CONTROLLED_ROOM_TEMP",
+    "validated_hold_hours": 96,
+    "insulation_r_value": 26.0,
+    "payload_capacity_liters": 85.0,
+    "reusable": true,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0009",
+    "model_name": "ColdChain GelPack Insulated EuroBox CRT",
+    "packaging_type": "GEL_PACK_INSULATED",
+    "target_regime": "CONTROLLED_ROOM_TEMP",
+    "validated_hold_hours": 48,
+    "insulation_r_value": 14.5,
+    "payload_capacity_liters": 35.0,
+    "reusable": false,
+    "lifecycle_state": "QUALIFIED"
+  },
+  {
+    "packaging_id": "PKG-2026-0010",
+    "model_name": "IsoTherm GelPack Chilled Courier Box 2-8C",
+    "packaging_type": "GEL_PACK_INSULATED",
+    "target_regime": "REFRIGERATED",
+    "validated_hold_hours": 48,
+    "insulation_r_value": 16.0,
+    "payload_capacity_liters": 25.0,
+    "reusable": false,
+    "lifecycle_state": "QUALIFIED"
+  }
+]
