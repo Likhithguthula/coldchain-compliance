@@ -1,0 +1,17 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+.test_write
+
+# Exclude only the largest redundant binary/JSON dumps in data/full (>30MB) to keep git clone fast,
+# while committing 100% of data/starter (CSV, JSON, SQL, SQLite DB, ground_truth) and
+# 100% of data/full/csv/, data/full/ground_truth/, and data/full/source_manifest.json!
+data/full/json/TemperatureReading.json
+data/full/sql/cold_chain_compliance.db
+data/full/sql/seed_data.sql
