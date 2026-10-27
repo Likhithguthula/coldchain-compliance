@@ -117,6 +117,16 @@ https://chatgpt.com/share/6ae0b619-e3bc-83e8-862d-98c3dceab3a5, fix the issues c
 
 ---
 
+### Tool A: Google Antigravity — Prompt 4 (README Python Version Documentation Alignment)
+**Submitted**: `2026-10-27T20:26:18+05:30`
+```text
+README Python version mismatch
+
+The README says the project was tested on Python 3.14.5, but my verification environment used Python 3.13.5. This is a documentation mismatch, not a reproduced application bug. Update the README to list the version you actually tested, or test it on Python 3.14.5 before making that claim. fix this and complete the problem everything and update the D:\Files\Desktop\Yotta
+```
+
+---
+
 ### Disclosure on Prompt Export & Tool Limitations (FAQ #6)
 - All prompts submitted to **Google Antigravity** were extracted verbatim from the local session transcript (`transcript.jsonl`).
 - All prompts and QA findings from **OpenAI ChatGPT** were recovered directly from the two public share links (`https://chatgpt.com/share/6ae08dbc-9e40-83ee-9465-c207ba152e88` and `https://chatgpt.com/share/6ae0b619-e3bc-83e8-862d-98c3dceab3a5`). No other AI tools were used.

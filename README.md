@@ -27,7 +27,7 @@
 This project uses **100% Python Standard Library (`csv`, `json`, `sqlite3`, `math`, `hashlib`, `datetime`, `unittest`)** with **zero external third-party package dependencies** so any reviewer can clone and run it immediately on Windows, macOS, or Linux.
 
 ### Prerequisites
-- Python `3.10+` (tested on Python `3.14.5`)
+- Python `3.10+` (verified on Python `3.13.5` and `3.14.5` across Linux and Windows environments)
 
 ### Step 1: Run the End-to-End Pipeline (Generates Starter & Full Datasets + Runs All Validations)
 ```bash
