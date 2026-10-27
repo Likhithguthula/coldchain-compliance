@@ -69,6 +69,19 @@
 | `CUSTODY_GAP_NOT_FLAGGED` | `50` | `50` | `100.0%` |
 | `CROSS_SHIPMENT_EXCURSION_CALC` | `50` | `50` | `100.0%` |
 
+### Granular Audit & Decision Accuracy Metrics (Ground-Truth Reconstruction vs. Pre-Audit Reports)
+
+| Evaluation Metric | Measured Value | Interpretation |
+| :--- | ---: | :--- |
+| **Ground-Truth Reconstruction Accuracy** | `100.00%` (`5,000 / 5,000`) | Independent audit engine reconstructs 100% of true statuses & dispositions from source records |
+| **Original Pre-Audit Report Decision Accuracy** | `96.00%` | Reflects the intentionally injected negative process defects in `ExcursionReport` before audit correction |
+| **Original Pre-Audit Disposition Accuracy** | `96.00%` | Reflects dispositions prior to independent audit override |
+| **Edge-Case Detection Precision** | `100.00%` | Zero false-positive anomaly accusations on normal/operational shipments |
+| **Edge-Case Detection Recall** | `100.00%` | 100% of injected negative edge cases (`250 / 250`) caught by independent auditor |
+| **False-Compliant Shipments (Pre-Audit)** | `100` | Shipments reported as `COMPLIANT` due to injected defects (`MISSING_DATA_SILENTLY_PASSED`, `CUSTODY_GAP_NOT_FLAGGED`) caught by auditor |
+| **Incorrect Excursion Durations (Pre-Audit)** | `100` | Reports with cross-shipment or wrong-policy duration discrepancies caught by auditor |
+| **Incorrect Dispositions (Pre-Audit)** | `200` | Reports with defective disposition decisions caught and overridden by auditor |
+
 ---
 
 ## 4. Compliance Status Distribution (Ground Truth vs. Reported)
@@ -100,7 +113,7 @@
 | `csv/ShipmentLot.csv` | `300` | `300` | `9ff23e525a0ce2ede651273c...` | `IDENTICAL` |
 | `csv/ShipmentStateHistory.csv` | `1,500` | `1,500` | `029cc41b652a1773b7240568...` | `IDENTICAL` |
 | `csv/TemperatureReading.csv` | `4,666` | `4,666` | `a0247ad20577de044bfc6d90...` | `IDENTICAL` |
-| `csv/ThresholdPolicy.csv` | `10` | `10` | `52084126f4bd876f9accf617...` | `IDENTICAL` |
+| `csv/ThresholdPolicy.csv` | `10` | `10` | `4fd433bc309a10ee12acce0f...` | `IDENTICAL` |
 | `ground_truth/ground_truth.csv` | `250` | `250` | `359d944c25421f3385c16de1...` | `IDENTICAL` |
 | `ground_truth/ground_truth.json` | `250` | `250` | `9191f546898f5f41401cacd0...` | `IDENTICAL` |
 | `json/CustodyEvent.json` | `750` | `750` | `a9e8a92ddf20d1c388101b8a...` | `IDENTICAL` |
@@ -115,5 +128,5 @@
 | `json/ShipmentLot.json` | `300` | `300` | `3bf4074bc2daa9d2133735a9...` | `IDENTICAL` |
 | `json/ShipmentStateHistory.json` | `1,500` | `1,500` | `d738cec234597730bbfb1f36...` | `IDENTICAL` |
 | `json/TemperatureReading.json` | `4,666` | `4,666` | `553eeb1f6e8c14260e908163...` | `IDENTICAL` |
-| `json/ThresholdPolicy.json` | `10` | `10` | `3739e941b1549e8bfbf20562...` | `IDENTICAL` |
-| `sql/seed_data.sql` | `8,893` | `8,893` | `c6f35ea305df433fd20ae340...` | `IDENTICAL` |
+| `json/ThresholdPolicy.json` | `10` | `10` | `343d1b8da9c4f91d7ff07450...` | `IDENTICAL` |
+| `sql/seed_data.sql` | `8,893` | `8,893` | `850dea532dbb087c636658e0...` | `IDENTICAL` |

@@ -127,13 +127,18 @@ All metrics in `ExcursionReport` are derived directly from source `TemperatureRe
    $$\text{MKT (K)} = \frac{\Delta H / R}{-\ln \left( \frac{1}{N} \sum_{i=1}^{N} e^{-\Delta H / (R \cdot T_i)} \right)}$$
    where $\Delta H = 83.14472\text{ kJ/mol}$ and $R = 0.008314472\text{ kJ/(mol}\cdot\text{K)}$. Because MKT weights higher temperatures exponentially, brief thermal spikes have a higher kinetic impact than arithmetic averages reveal.
 2. **Excursion Duration & Contiguous Window Calculation**:
-   - Each 10-minute reading outside `[min_temp_c, max_temp_c]` increments `total_excursion_duration_min` by `10` minutes and tracks `max_single_excursion_min` (longest contiguous breach) and `first_breach_reading_id` (exact traceability to the offending reading).
+   - Readings within the inclusive range `[min_temp_c, max_temp_c]` are compliant; readings strictly outside (`< min_temp_c` or `> max_temp_c`) are breaches.
+   - For standard 10-minute intervals, each breaching reading increments `total_excursion_duration_min` by `10` minutes and tracks `max_single_excursion_min` (longest contiguous breach) and `first_breach_reading_id`.
+   - When an excursion spans across irregular or missing telemetry intervals ($\Delta t > 10\text{ min}$), `ComplianceEngine` computes the actual elapsed timestamp difference rather than understating the breach as a fixed 10-minute step, flags `uncertainty_borderline_flag = True`, and routes the shipment to `NON_COMPLIANT_MISSING_DATA` / `QUARANTINE_HOLD` (or `CRITICAL_EXCURSION` if thresholds are exceeded).
 3. **Calibration Uncertainty Borderline Rule**:
-   - Every logger carries a NIST-traceable `calibration_uncertainty_c` ($\pm 0.15^\circ\text{C}$ to $\pm 0.50^\circ\text{C}$). When a reading lies within $|T - T_{\text{limit}}| \le \text{uncertainty}$, `uncertainty_borderline_flag` is set to `True` and routed to `INVESTIGATION_REQUIRED` / `QA_MANUAL_REVIEW`.
-4. **Telemetry & Custody Gap Rules**:
-   - Expected readings: $\lfloor (t_{\text{arrival}} - t_{\text{departure}}) / 10\text{ min} \rfloor + 1$.
-   - Any consecutive reading gap $> \text{max\_telemetry\_gap\_min}$ sets `telemetry_gap_flagged = True` (`NON_COMPLIANT_MISSING_DATA`).
-   - Any custody handover delay $> 120\text{ min}$ sets `custody_gap_flagged = True` (`NON_COMPLIANT_CUSTODY_GAP`).
+   - Every logger carries a NIST-traceable `calibration_uncertainty_c` ($\pm 0.15^\circ\text{C}$ to $\pm 0.50^\circ\text{C}$). When a reading lies within $0 < |T - T_{\text{limit}}| \le \text{uncertainty}$, `uncertainty_borderline_flag` is set to `True` and routed to `INVESTIGATION_REQUIRED` / `QA_MANUAL_REVIEW`.
+4. **Expected Time-Grid Telemetry, Duplicate Detection & Custody Gap Rules**:
+   - Expected readings are verified against the explicit 10-minute timestamp grid $\{t_{\text{dep}}, t_{\text{dep}}+10\text{m}, \dots, t_{\text{arr}}\}$ rather than raw row counts.
+   - Duplicate reading IDs or duplicate timestamps per logger are detected and deduplicated before grid comparison so duplicate rows can never mask missing intervals.
+   - Any missing-data window $\ge \text{max\_telemetry\_gap\_min}$ (inclusive exact boundary) or incomplete grid coverage sets `telemetry_gap_flagged = True` (`NON_COMPLIANT_MISSING_DATA`).
+   - Any custody handover delay $> \text{max\_custody\_gap\_min}$ (configurable per `ThresholdPolicy`, default `120` min) sets `custody_gap_flagged = True` (`NON_COMPLIANT_CUSTODY_GAP`).
+5. **Product-Policy Compatibility & Cross-Shipment Isolation**:
+   - `ComplianceEngine.evaluate_shipment()` verifies that `policy.product_id` matches the shipment's `expected_product_id`, that the shipment window falls within `[policy.effective_from, policy.effective_to]`, and that readings belong strictly to `expected_shipment_id` and `expected_logger_ids` within `[actual_departure_utc, actual_arrival_utc]`. Any mismatch or foreign reading triggers `INVESTIGATION_REQUIRED` / `QUARANTINE_HOLD`.
 
 ---
 

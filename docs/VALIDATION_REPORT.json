@@ -56,6 +56,14 @@
       "passed": true,
       "total_shipments_audited": 5000,
       "ground_truth_exact_matches": 5000,
+      "ground_truth_reconstruction_accuracy_pct": 100.0,
+      "original_report_decision_accuracy_pct": 96.0,
+      "original_report_disposition_accuracy_pct": 96.0,
+      "edge_case_detection_precision_pct": 100.0,
+      "edge_case_detection_recall_pct": 100.0,
+      "false_compliant_shipments_in_uncorrected_reports": 100,
+      "incorrect_excursion_durations_in_uncorrected_reports": 100,
+      "incorrect_dispositions_in_uncorrected_reports": 200,
       "detected_edge_case_counts": {
         "LOGGER_NOT_ASSIGNED": 50,
         "PRODUCT_THRESHOLD_MISMATCH": 50,
@@ -174,8 +182,8 @@
         "file": "csv/ThresholdPolicy.csv",
         "row_count_run1": 10,
         "row_count_run2": 10,
-        "sha256_run1": "52084126f4bd876f9accf6179b0962820ec6b1cdfe5712184626d7e85880aea8",
-        "sha256_run2": "52084126f4bd876f9accf6179b0962820ec6b1cdfe5712184626d7e85880aea8",
+        "sha256_run1": "4fd433bc309a10ee12acce0f3ccbaba9965b8ee89c5b277beb6f80edbfefafbf",
+        "sha256_run2": "4fd433bc309a10ee12acce0f3ccbaba9965b8ee89c5b277beb6f80edbfefafbf",
         "identical": true
       },
       {
@@ -294,16 +302,16 @@
         "file": "json/ThresholdPolicy.json",
         "row_count_run1": 10,
         "row_count_run2": 10,
-        "sha256_run1": "3739e941b1549e8bfbf2056288d2f8ac430ad85592febd578810d480de171e38",
-        "sha256_run2": "3739e941b1549e8bfbf2056288d2f8ac430ad85592febd578810d480de171e38",
+        "sha256_run1": "343d1b8da9c4f91d7ff074504ee4c58fa16bc1492ede7fb44c4cff46b78f1e9e",
+        "sha256_run2": "343d1b8da9c4f91d7ff074504ee4c58fa16bc1492ede7fb44c4cff46b78f1e9e",
         "identical": true
       },
       {
         "file": "sql/seed_data.sql",
         "row_count_run1": 8893,
         "row_count_run2": 8893,
-        "sha256_run1": "c6f35ea305df433fd20ae34057ed95cb897702f0c43d20f22d51f211d7e74509",
-        "sha256_run2": "c6f35ea305df433fd20ae34057ed95cb897702f0c43d20f22d51f211d7e74509",
+        "sha256_run1": "850dea532dbb087c636658e08a1f27f13d8b28d82c0fc5d8b959fd2b78d210c3",
+        "sha256_run2": "850dea532dbb087c636658e08a1f27f13d8b28d82c0fc5d8b959fd2b78d210c3",
         "identical": true
       }
     ]

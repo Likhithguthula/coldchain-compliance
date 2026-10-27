@@ -343,7 +343,14 @@ class DatasetValidator:
     def _audit_edge_cases_and_ground_truth(self) -> Dict[str, Any]:
         """
         Independently audit every shipment from raw master/transaction/event tables
-        to detect all 5 injected negative edge cases and verify 100% agreement with GroundTruth!
+        to detect all 5 injected negative edge cases, verify 100% agreement with GroundTruth,
+        and publish separate metrics for:
+        - Ground-truth reconstruction accuracy
+        - Original compliance-report decision accuracy
+        - Edge-case detection precision and recall
+        - False-compliant shipments
+        - Incorrect excursion durations
+        - Incorrect dispositions
         """
         canonical_pol_by_prod: Dict[str, PolicyThresholds] = {}
         for p in self.datasets["ThresholdPolicy"]:
@@ -358,6 +365,9 @@ class DatasetValidator:
                 max_cumulative_excursion_min=p["max_cumulative_excursion_min"],
                 max_mkt_c=p["max_mkt_c"],
                 max_telemetry_gap_min=p["max_telemetry_gap_min"],
+                max_custody_gap_min=p.get("max_custody_gap_min", CUSTODY_GAP_THRESHOLD_MIN),
+                effective_from=p.get("effective_from", "2026-01-01T00:00:00Z"),
+                effective_to=p.get("effective_to"),
             )
             canonical_pol_by_prod[p["product_id"]] = pol_obj
 
@@ -399,7 +409,17 @@ class DatasetValidator:
             "CROSS_SHIPMENT_EXCURSION_CALC": 0,
         }
         gt_matches = 0
+        original_report_status_matches = 0
+        original_report_disposition_matches = 0
+        false_compliant_shipments = 0
+        incorrect_excursion_durations = 0
+        incorrect_dispositions = 0
+        true_positive_edge_detections = 0
+        false_positive_edge_detections = 0
+        false_negative_edge_detections = 0
         mismatches: List[str] = []
+
+        total_shipments = len(self.datasets["Shipment"])
 
         for shp in self.datasets["Shipment"]:
             sid = shp["shipment_id"]
@@ -419,6 +439,9 @@ class DatasetValidator:
                 custody_handover_gaps_min=custody_gaps,
                 has_assigned_logger=len(shp_loggers) > 0,
                 sampling_interval_min=10,
+                expected_product_id=shp["primary_product_id"],
+                expected_shipment_id=sid,
+                expected_logger_ids=set(shp_loggers) if shp_loggers else None,
             )
 
             # Audit detection rules from raw tables + ExcursionReport:
@@ -437,22 +460,64 @@ class DatasetValidator:
             if detected_edge != "NONE":
                 detected_counts[detected_edge] += 1
 
+            # Precision / Recall tracking for injected edge cases
+            gt_edge = gt["edge_case_type"]
+            if detected_edge != "NONE" and detected_edge == gt_edge:
+                true_positive_edge_detections += 1
+            elif detected_edge != "NONE" and detected_edge != gt_edge:
+                false_positive_edge_detections += 1
+            elif detected_edge == "NONE" and gt_edge != "NONE":
+                false_negative_edge_detections += 1
+
+            # Compare pre-audit original ExcursionReport against reconstructed ground truth (Bug 5 fix)
+            if rep["compliance_status"] == true_eval.compliance_status:
+                original_report_status_matches += 1
+            if rep["disposition_decision"] == true_eval.disposition_decision:
+                original_report_disposition_matches += 1
+            else:
+                incorrect_dispositions += 1
+
+            if rep["compliance_status"] == "COMPLIANT" and true_eval.compliance_status != "COMPLIANT":
+                false_compliant_shipments += 1
+
+            if rep["total_excursion_duration_min"] != true_eval.total_excursion_duration_min:
+                incorrect_excursion_durations += 1
+
             if (
-                detected_edge == gt["edge_case_type"]
+                detected_edge == gt_edge
                 and true_eval.compliance_status == gt["true_compliance_status"]
                 and true_eval.disposition_decision == gt["true_disposition_decision"]
             ):
                 gt_matches += 1
             else:
                 mismatches.append(
-                    f"{sid}: detected_edge={detected_edge} vs gt={gt['edge_case_type']}, "
+                    f"{sid}: detected_edge={detected_edge} vs gt={gt_edge}, "
                     f"true_status={true_eval.compliance_status} vs gt={gt['true_compliance_status']}"
                 )
 
+        precision = (
+            round((true_positive_edge_detections / (true_positive_edge_detections + false_positive_edge_detections)) * 100.0, 2)
+            if (true_positive_edge_detections + false_positive_edge_detections) > 0
+            else 0.0
+        )
+        recall = (
+            round((true_positive_edge_detections / (true_positive_edge_detections + false_negative_edge_detections)) * 100.0, 2)
+            if (true_positive_edge_detections + false_negative_edge_detections) > 0
+            else 0.0
+        )
+
         return {
             "passed": len(mismatches) == 0 and all(v > 0 for v in detected_counts.values()),
-            "total_shipments_audited": len(self.datasets["Shipment"]),
+            "total_shipments_audited": total_shipments,
             "ground_truth_exact_matches": gt_matches,
+            "ground_truth_reconstruction_accuracy_pct": round((gt_matches / total_shipments) * 100.0, 2),
+            "original_report_decision_accuracy_pct": round((original_report_status_matches / total_shipments) * 100.0, 2),
+            "original_report_disposition_accuracy_pct": round((original_report_disposition_matches / total_shipments) * 100.0, 2),
+            "edge_case_detection_precision_pct": precision,
+            "edge_case_detection_recall_pct": recall,
+            "false_compliant_shipments_in_uncorrected_reports": false_compliant_shipments,
+            "incorrect_excursion_durations_in_uncorrected_reports": incorrect_excursion_durations,
+            "incorrect_dispositions_in_uncorrected_reports": incorrect_dispositions,
             "detected_edge_case_counts": detected_counts,
             "orphan_temperature_readings_detected": orphan_reading_count,
             "mismatch_count": len(mismatches),

@@ -542,6 +542,7 @@ class SyntheticDataGenerator:
                 "max_cumulative_excursion_min": item["max_cumulative_excursion_min"],
                 "max_mkt_c": item["max_mkt_c"],
                 "max_telemetry_gap_min": item["max_telemetry_gap_min"],
+                "max_custody_gap_min": CUSTODY_GAP_THRESHOLD_MIN,
                 "effective_from": "2026-01-01T00:00:00Z",
                 "effective_to": None,
                 "lifecycle_state": "ACTIVE",
@@ -559,6 +560,9 @@ class SyntheticDataGenerator:
                 max_cumulative_excursion_min=item["max_cumulative_excursion_min"],
                 max_mkt_c=item["max_mkt_c"],
                 max_telemetry_gap_min=item["max_telemetry_gap_min"],
+                max_custody_gap_min=CUSTODY_GAP_THRESHOLD_MIN,
+                effective_from="2026-01-01T00:00:00Z",
+                effective_to=None,
             )
             self.policy_by_id[pol_id] = pol_obj
             self.canonical_policy_by_product[prod_id] = pol_obj
@@ -1341,6 +1345,7 @@ def _write_sql_and_sqlite(
             max_cumulative_excursion_min INTEGER NOT NULL,
             max_mkt_c REAL NOT NULL,
             max_telemetry_gap_min INTEGER NOT NULL,
+            max_custody_gap_min INTEGER NOT NULL,
             effective_from TEXT NOT NULL,
             effective_to TEXT,
             lifecycle_state TEXT NOT NULL

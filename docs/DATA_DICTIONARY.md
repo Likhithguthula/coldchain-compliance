@@ -86,7 +86,8 @@ Defines product-specific temperature thresholds, cumulative/single excursion tol
 | `max_single_excursion_min` | `INTEGER` | Required | `10` to `240` | `minutes` | Non-unique | `max_single_excursion_min > 0` and `<= max_cumulative_excursion_min` |
 | `max_cumulative_excursion_min` | `INTEGER` | Required | `20` to `480` | `minutes` | Non-unique | `>= max_single_excursion_min` |
 | `max_mkt_c` | `FLOAT` | Required | `-55.0` to `28.0` | `°C` | Non-unique | `max_mkt_c >= max_temp_c` |
-| `max_telemetry_gap_min` | `INTEGER` | Required | `20` to `60` | `minutes` | Non-unique | `>= 20` (since baseline interval is 10 minutes) |
+| `max_telemetry_gap_min` | `INTEGER` | Required | `20` to `60` | `minutes` | Non-unique | `>= 20` (missing-data interval `>= max_telemetry_gap_min` is flagged) |
+| `max_custody_gap_min` | `INTEGER` | Required | `60` to `240` | `minutes` | Non-unique | `> 0` (configurable custody handover delay limit, default `120` min) |
 | `effective_from` | `ISO_DATETIME` | Required | ISO-8601 UTC | `UTC` | Non-unique | Valid ISO timestamp |
 | `effective_to` | `ISO_DATETIME` | Optional | ISO-8601 UTC or `NULL` | `UTC` | Non-unique | `NULL` or `> effective_from` |
 | `lifecycle_state` | `ENUM` | Required | `ACTIVE`, `SUPERSEDED`, `RETIRED` | N/A | Non-unique | Valid enum |
