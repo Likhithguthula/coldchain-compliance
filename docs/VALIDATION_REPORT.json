@@ -80,6 +80,12 @@
     "seed": 20261022,
     "scale": "starter",
     "reproducible_100_pct": true,
+    "sqlite_foreign_key_enforcement": {
+      "passed": true,
+      "pragma_foreign_keys_on": true,
+      "foreign_key_check_violations": 0,
+      "invalid_fk_insert_rejected": true
+    },
     "files_compared": 29,
     "comparisons": [
       {

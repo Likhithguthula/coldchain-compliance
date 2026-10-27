@@ -1313,6 +1313,21 @@ def export_datasets(
     return manifest
 
 
+def open_sqlite_db(sqlite_db_path: Path | str) -> sqlite3.Connection:
+    """
+    Open a connection to the Cold-Chain Compliance SQLite database with
+    `PRAGMA foreign_keys = ON;` strictly enforced and verified on the connection.
+    (SQLite requires enabling foreign_keys per connection rather than persisting it in the DB file).
+    """
+    conn = sqlite3.connect(str(sqlite_db_path))
+    conn.execute("PRAGMA foreign_keys = ON;")
+    fk_enabled = conn.execute("PRAGMA foreign_keys;").fetchone()[0]
+    if fk_enabled != 1:
+        conn.close()
+        raise RuntimeError("SQLite build does not support PRAGMA foreign_keys = ON")
+    return conn
+
+
 def _write_sql_and_sqlite(
     datasets: Dict[str, List[Dict[str, Any]]],
     sql_seed_path: Path,
@@ -1494,9 +1509,8 @@ def _write_sql_and_sqlite(
         );""",
     ]
 
-    conn = sqlite3.connect(str(sqlite_db_path))
+    conn = open_sqlite_db(sqlite_db_path)
     cur = conn.cursor()
-    cur.execute("PRAGMA foreign_keys = ON;")
 
     for ddl in ddl_statements:
         cur.execute(ddl)

@@ -45,7 +45,7 @@ What this single command does in ~20 seconds:
 python -m unittest discover -s tests -v
 ```
 
-### Step 3: Run Individual Generator or Validator CLI Commands
+### Step 3: Run Individual Generator, Validator, or Shipment Inspector CLI Commands
 ```bash
 # Generate only the starter dataset (250 shipments, 100 loggers)
 python -m src.generator --seed 20261022 --scale starter --output-dir data/starter
@@ -55,6 +55,12 @@ python -m src.generator --seed 20261022 --scale full --output-dir data/full
 
 # Run the standalone validator & two-run reproducibility verifier
 python -m src.validator --seed 20261022 --scale full --report-out docs/VALIDATION_REPORT.json
+
+# View the Operations Manager & Analyst portfolio summary and exception queue
+python -m src.inspector --scale starter --list-exceptions
+
+# Inspect a complete traceability dossier for any individual shipment (e.g. an injected anomaly)
+python -m src.inspector --scale starter --shipment-id SHP-2026-000018
 ```
 
 ---
@@ -177,6 +183,10 @@ Full validation results are available in [`docs/VALIDATION_SUMMARY.md`](docs/VAL
    - Rather than only storing a mutable status column, every state transition (`PLANNED -> PACKED -> IN_TRANSIT -> DELIVERED -> EVALUATED -> CLOSED_*`) is persisted as an immutable event record in `ShipmentStateHistory`.
 3. **Zero Third-Party Dependencies**:
    - Built strictly with Python's standard library so reviewers never face `pip` compilation issues or environment conflicts.
+4. **SQLite Foreign-Key Enforcement (`PRAGMA foreign_keys = ON`)**:
+   - Because SQLite resets `PRAGMA foreign_keys = 0` on newly opened connections by default, [`open_sqlite_db()`](src/generator.py) explicitly enables and verifies `PRAGMA foreign_keys = ON;` on every database connection. Consumers opening `cold_chain_compliance.db` directly via `sqlite3` should either call `open_sqlite_db()` or run `PRAGMA foreign_keys = ON;` upon connection.
+5. **CLI & Programmatic Architecture (Scope Clarification)**:
+   - Per the YottaFlex AI FAQ (#9: *"No hosted demo or automated test suite is mandatory"*), this platform is architected as a self-contained CLI and data-engineering pipeline rather than a browser web app, complete with an Operations Manager & Analyst CLI Inspector (`python -m src.inspector`) for inspecting shipment dossiers and exception queues.
 
 ### Trade-offs & Known Limitations
 - **Trip Duration Scaling for Disk Footprint**: Trip durations are modeled between `2.0` and `4.0` hours (`13` to `25` readings at 10-minute intervals, yielding `93,395` readings for `5,000` shipments) so the full dataset generates in `<15` seconds and fits comfortably on disk while exercising all excursion, dwell, MKT, and gap rules.
@@ -210,6 +220,7 @@ Full validation results are available in [`docs/VALIDATION_SUMMARY.md`](docs/VAL
 │   ├── compliance_engine.py           # MKT (Haynes), excursion, gap, uncertainty & disposition engine
 │   ├── generator.py                   # Deterministic Step 1-9 synthetic data generator (seed=20261022)
 │   ├── validator.py                   # Step 8 relational/arithmetic/audit validator & Step 10 verifier
+│   ├── inspector.py                   # Operations Manager & Analyst CLI shipment/exception inspector
 │   └── cli.py                         # End-to-end orchestrator CLI
 ├── tests/
 │   └── test_pipeline.py               # Automated unittest suite verifying all requirements

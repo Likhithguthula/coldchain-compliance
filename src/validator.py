@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sqlite3
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -35,7 +36,7 @@ from src.compliance_engine import (
     compute_mkt_celsius,
     parse_iso_utc,
 )
-from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets
+from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets, open_sqlite_db
 
 
 PK_REGEX_RULES = {
@@ -525,15 +526,48 @@ class DatasetValidator:
         }
 
 
+def verify_sqlite_foreign_key_enforcement(sqlite_db_path: Path | str) -> Dict[str, Any]:
+    """
+    Verify that `open_sqlite_db` enables `PRAGMA foreign_keys = ON`, passes `PRAGMA foreign_key_check`,
+    and actively rejects an invalid foreign-key insert with `sqlite3.IntegrityError`.
+    """
+    conn = open_sqlite_db(sqlite_db_path)
+    try:
+        fk_pragma_val = conn.execute("PRAGMA foreign_keys;").fetchone()[0]
+        fk_violations = conn.execute("PRAGMA foreign_key_check;").fetchall()
+
+        rejected_invalid_fk = False
+        try:
+            conn.execute(
+                "INSERT INTO Lot (lot_id, product_id, manufacturing_site, manufactured_date, expiry_date, "
+                "initial_quantity_units, remaining_stability_budget_min, lifecycle_state) "
+                "VALUES ('LOT-2026-999999', 'PROD-NONEXISTENT-9999', 'TEST-SITE', '2026-01-01', '2027-01-01', 100, 60, 'RELEASED');"
+            )
+            conn.rollback()
+        except sqlite3.IntegrityError:
+            rejected_invalid_fk = True
+            conn.rollback()
+
+        return {
+            "passed": (fk_pragma_val == 1) and (len(fk_violations) == 0) and rejected_invalid_fk,
+            "pragma_foreign_keys_on": fk_pragma_val == 1,
+            "foreign_key_check_violations": len(fk_violations),
+            "invalid_fk_insert_rejected": rejected_invalid_fk,
+        }
+    finally:
+        conn.close()
+
+
 def verify_reproducibility(seed: int = DEFAULT_SEED, scale: str = "starter") -> Dict[str, Any]:
     """
     Step 10: Regenerate dataset twice in isolated directories with the same fixed seed
-    and compare all row counts and file SHA-256 checksums.
+    and compare all row counts and file SHA-256 checksums, plus verify SQLite FK enforcement.
     """
     with tempfile.TemporaryDirectory() as tmp1, tempfile.TemporaryDirectory() as tmp2:
         gen1 = SyntheticDataGenerator(seed=seed, scale=scale)
         ds1 = gen1.generate_all()
         man1 = export_datasets(ds1, Path(tmp1), seed=seed, scale=scale, export_sql=True)
+        sqlite_fk_check = verify_sqlite_foreign_key_enforcement(Path(tmp1) / "sql" / "cold_chain_compliance.db")
 
         gen2 = SyntheticDataGenerator(seed=seed, scale=scale)
         ds2 = gen2.generate_all()
@@ -562,7 +596,8 @@ def verify_reproducibility(seed: int = DEFAULT_SEED, scale: str = "starter") -> 
         return {
             "seed": seed,
             "scale": scale,
-            "reproducible_100_pct": all_identical,
+            "reproducible_100_pct": all_identical and sqlite_fk_check["passed"],
+            "sqlite_foreign_key_enforcement": sqlite_fk_check,
             "files_compared": len(comparisons),
             "comparisons": comparisons,
         }

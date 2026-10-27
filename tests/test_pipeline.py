@@ -26,6 +26,9 @@ Run via:
 
 from __future__ import annotations
 
+import sqlite3
+import tempfile
+from pathlib import Path
 import unittest
 from src.compliance_engine import (
     ComplianceEngine,
@@ -34,8 +37,8 @@ from src.compliance_engine import (
     compute_mkt_celsius,
     parse_iso_utc,
 )
-from src.generator import DEFAULT_SEED, SyntheticDataGenerator
-from src.validator import DatasetValidator, verify_reproducibility
+from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets, open_sqlite_db
+from src.validator import DatasetValidator, verify_reproducibility, verify_sqlite_foreign_key_enforcement
 
 
 def make_test_policy(
@@ -404,6 +407,37 @@ class TestColdChainCompliancePlatform(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             parse_iso_utc("not-a-timestamp")
+
+    def test_16_sqlite_foreign_key_enforcement_rejects_invalid_insert(self) -> None:
+        """
+        Verify that `open_sqlite_db` enables `PRAGMA foreign_keys = ON` on every connection
+        and that SQLite actively rejects invalid foreign-key references with `sqlite3.IntegrityError`.
+        """
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            export_datasets(self.datasets, Path(tmp_dir), seed=DEFAULT_SEED, scale="starter", export_sql=True)
+            db_path = Path(tmp_dir) / "sql" / "cold_chain_compliance.db"
+
+            fk_report = verify_sqlite_foreign_key_enforcement(db_path)
+            self.assertTrue(fk_report["passed"])
+            self.assertTrue(fk_report["pragma_foreign_keys_on"])
+            self.assertEqual(fk_report["foreign_key_check_violations"], 0)
+            self.assertTrue(fk_report["invalid_fk_insert_rejected"])
+
+            conn = open_sqlite_db(db_path)
+            try:
+                self.assertEqual(conn.execute("PRAGMA foreign_keys;").fetchone()[0], 1)
+                with self.assertRaises(sqlite3.IntegrityError):
+                    conn.execute(
+                        "INSERT INTO Shipment (shipment_id, primary_product_id, assigned_policy_id, packaging_id, "
+                        "supplier_actor, planner_actor, carrier_actor, origin_location, destination_location, "
+                        "transport_mode, planned_departure_utc, planned_arrival_utc, actual_departure_utc, "
+                        "actual_arrival_utc, total_distance_km, declared_value_usd, lifecycle_state) "
+                        "VALUES ('SHP-2026-999999', 'PROD-INVALID', 'POL-INVALID', 'PKG-INVALID', "
+                        "'SUP', 'PLN', 'CAR', 'ORIG', 'DEST', 'AIR_FREIGHT', '2026-01-01T00:00:00Z', "
+                        "'2026-01-01T02:00:00Z', '2026-01-01T00:00:00Z', '2026-01-01T02:00:00Z', 100.0, 500.0, 'PLANNED');"
+                    )
+            finally:
+                conn.close()
 
 
 if __name__ == "__main__":
