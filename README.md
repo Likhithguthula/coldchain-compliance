@@ -3,7 +3,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
 [![Zero External Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Stdlib%20Only)-brightgreen.svg)](#1-quick-start--make-it-run)
 [![Seed 20261022](https://img.shields.io/badge/Fixed%20Seed-20261022-purple.svg)](#6-reproducibility--validation-proof-steps-8--10)
-[![Post-Audit Validation](https://img.shields.io/badge/Post--Audit%20Validation-100%25%20Passing%20(96%25%20Pre--Audit)-success.svg)](docs/VALIDATION_SUMMARY.md)
+[![Post-Audit Validation](https://img.shields.io/badge/Post--Audit%20Validation-100%25%20Passing%20(96.4%25%20Pre--Audit%20Decision%20%2F%2096.0%25%20Disposition)-success.svg)](docs/VALIDATION_SUMMARY.md)
 
 **End-to-End Solution for Temperature-Sensitive Pharmaceutical & Biologic Shipment Compliance, Excursion Evaluation, Operational QA Audit, Traceability, and Deviation Management.**
 
@@ -159,7 +159,7 @@ All metrics in `ExcursionReport` and `ComplianceReview` are derived directly fro
 
 In accordance with **Step 4**, **Step 5**, and **Step 7**:
 - Product assignment is stratified across 100-shipment scenario blocks so **all `10` products experience all `11` scenario categories (`110 / 110` product-scenario combinations covered)** in the 5,000-shipment dataset.
-- Valid baseline records are generated first, and **5 specific negative system/process edge cases** (`50` shipments each in full scale, `250` total; `96.0%` pre-audit report decision accuracy) are injected into `ExcursionReport`.
+- Valid baseline records are generated first, and **5 specific negative system/process edge cases** (`50` shipments each in full scale, `250` total; `96.4%` pre-audit report decision accuracy and `96.0%` pre-audit disposition accuracy) are injected into `ExcursionReport`.
 - Operational QA auditing (`ComplianceEngine.audit_shipment_record` / `ComplianceEngine.audit_dataset`) runs **exclusively on operational master/transaction/event tables and `ExcursionReport` (never reading `GroundTruth`)**, persists its findings in `ComplianceReview` (`REV-2026-000001` .. `005000`), and appends a corrective `seq 7` lifecycle event (`AUDIT_OVERRIDE_*`) to `ShipmentStateHistory` whenever an override changes the shipment's final disposition state (`100.0%` post-audit accuracy):
 
 | Edge Case Label (`anomaly_type`) | Count (Full) | How It Manifests in Pre-Audit Input Data | How the Operational Auditor Detects & Resolves It (`ComplianceReview`) |
@@ -180,7 +180,7 @@ Full validation results are available in [`docs/VALIDATION_SUMMARY.md`](docs/VAL
 - **Foreign Key & Compound Join Integrity**: `100% PASS` (`329,900` foreign-key references verified + compound `ShipmentLot` product match, `CustodyEvent` stop-shipment match, and `ExcursionReport.first_breach_reading_id` shipment/logger match).
 - **Date, Calibration Window, Non-Overlap & Lot Usability Checks**: `100% PASS` (verifies `Logger` calibration window covers every assigned shipment, zero overlapping `ShipmentLogger` windows per logger, and `Lot` usability/release state at dispatch).
 - **Arithmetic & Complete Lifecycle Reconciliation**: `100% PASS` (`5,000` shipment declared values reconciled to `SUM(lot_qty * unit_value_usd)`, `15,000` route stop dwells and `15,000` custody handoff gaps reconciled from timestamps, and `5,000` complete `ShipmentStateHistory` chains reconciled with final `Shipment.lifecycle_state` and `ComplianceReview`).
-- **Operational Audit vs. Ground Truth**: `5,000 / 5,000` (`100.0%`) exact match (`96.0%` pre-audit `ExcursionReport` decision accuracy before override -> `100.0%` post-audit `ComplianceReview` accuracy).
+- **Operational Audit vs. Ground Truth**: `5,000 / 5,000` (`100.0%`) exact match (`96.4%` pre-audit `ExcursionReport` decision accuracy and `96.0%` pre-audit disposition accuracy before override -> `100.0%` post-audit `ComplianceReview` accuracy).
 - **Step 10 Fixed-Seed Reproducibility**: Regenerating twice with `--seed 20261022` produces **100% identical row counts and SHA-256 checksums** across all `31` manifest-listed CSV, JSON, SQL, and Ground-Truth files, plus verifies `PRAGMA foreign_keys = ON` enforcement on `cold_chain_compliance.db`.
 
 ---
