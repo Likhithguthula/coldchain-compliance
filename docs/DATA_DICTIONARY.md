@@ -28,6 +28,9 @@ erDiagram
     Logger ||--o{ TemperatureReading : "records (1:N)"
     Shipment ||--o{ TemperatureReading : "linked reading (0..1:N)"
     Shipment ||--|| ExcursionReport : "evaluated by (1:1)"
+    ExcursionReport ||--|| ComplianceReview : "audited by (1:1)"
+    Shipment ||--|| ComplianceReview : "governed by (1:1)"
+    Shipment ||--|{ ShipmentStateHistory : "tracks lifecycle (1:N)"
 ```
 
 ### Cardinality & Relationship Summary
@@ -45,8 +48,9 @@ erDiagram
 | `RouteStop` | `CustodyEvent` | `1:N` | `CustodyEvent.stop_id -> RouteStop.stop_id` | Mandatory parent | Links each custody handoff event to the physical route stop. |
 | `Logger` | `TemperatureReading` | `1:N` | `TemperatureReading.logger_id -> Logger.logger_id` | Mandatory parent | Timestamped telemetry recorded by a physical logger. |
 | `Shipment` | `TemperatureReading` | `0..1:N` | `TemperatureReading.shipment_id -> Shipment.shipment_id` | Optional (`NULL` allowed) | Links reading to active shipment. Optional to represent `UNASSIGNED_LOGGER` orphan telemetry. |
-| `Shipment` | `ExcursionReport` | `1:1` | `ExcursionReport.shipment_id -> Shipment.shipment_id` | Mandatory parent | Final compliance and deviation evaluation report per shipment. |
-| `Shipment` | `ShipmentStateHistory` | `1:N` | `ShipmentStateHistory.shipment_id -> Shipment.shipment_id` | Mandatory parent | Immutable event history of shipment lifecycle transitions (persisting state changes without overwriting history). |
+| `Shipment` | `ExcursionReport` | `1:1` | `ExcursionReport.shipment_id -> Shipment.shipment_id` | Mandatory parent | Pre-audit compliance and deviation evaluation report per shipment. |
+| `ExcursionReport` / `Shipment` | `ComplianceReview` | `1:1` | `report_id`, `shipment_id`, `canonical_policy_id` | Mandatory parents | Persisted operational QA audit finding and corrective disposition override without overwriting `ExcursionReport`. |
+| `Shipment` | `ShipmentStateHistory` | `1:N` | `ShipmentStateHistory.shipment_id -> Shipment.shipment_id` | Mandatory parent | Immutable event history of shipment lifecycle transitions (persisting state changes and post-audit overrides without overwriting history). |
 
 ---
 
@@ -128,7 +132,7 @@ Defines thermal container types, cooling media, and validated autonomous hold ti
 ---
 
 ### 2.5 `Logger` (Master Table)
-Represents physical IoT / electronic temperature data loggers with NIST-traceable calibration attributes.
+Represents physical IoT / electronic temperature data loggers with synthetic calibration uncertainty attributes.
 
 | Field Name | Type | Required | Allowed Values / Format | Units | Uniqueness | Validation Rule |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -230,8 +234,9 @@ Immutable chain-of-custody handoff records between actors at route stops.
 | `event_type` | `ENUM` | Required | `PACKOUT_SEALED`, `CARRIER_PICKUP`, `HUB_ARRIVAL_SCAN`, `CUSTOMS_INSPECTION`, `HUB_DEPARTURE_SCAN`, `FINAL_RECEIPT`, `QUARANTINE_HOLD` | N/A | Non-unique | Valid enum |
 | `from_actor_role` | `ENUM` | Required | `SUPPLIER`, `PLANNER`, `CARRIER_OPERATOR`, `WAREHOUSE_OPERATOR`, `CUSTOMS_OFFICER`, `LOGISTICS_ANALYST`, `OPERATIONS_MANAGER` | N/A | Non-unique | Valid actor role |
 | `to_actor_role` | `ENUM` | Required | `SUPPLIER`, `PLANNER`, `CARRIER_OPERATOR`, `WAREHOUSE_OPERATOR`, `CUSTOMS_OFFICER`, `LOGISTICS_ANALYST`, `OPERATIONS_MANAGER` | N/A | Non-unique | Valid actor role |
-| `event_timestamp_utc` | `ISO_DATETIME` | Required | ISO-8601 UTC | `UTC` | Non-unique | Monotonically non-decreasing per shipment |
-| `handover_gap_min` | `INTEGER` | Required | `>= 0` | `minutes` | Non-unique | Derived difference from previous custody timestamp or stop arrival |
+| `handoff_started_utc` | `ISO_DATETIME` | Required | ISO-8601 UTC | `UTC` | Non-unique | Timestamp when custody transfer / staging began (`<= event_timestamp_utc`) |
+| `event_timestamp_utc` | `ISO_DATETIME` | Required | ISO-8601 UTC | `UTC` | Non-unique | Timestamp when custody transfer completed; monotonically non-decreasing per shipment |
+| `handover_gap_min` | `INTEGER` | Required | `>= 0` | `minutes` | Non-unique | Derived difference `(event_timestamp_utc - handoff_started_utc)` in minutes |
 | `custody_gap_flagged` | `BOOLEAN` | Required | `true`, `false` | N/A | Non-unique | `true` if `handover_gap_min > 120` (unless `CUSTODY_GAP_UNFLAGGED` edge case) |
 | `seal_intact` | `BOOLEAN` | Required | `true`, `false` | N/A | Non-unique | Boolean |
 | `operator_signature_hash` | `STRING` | Required | 16-char hex digest | N/A | Non-unique | Deterministic SHA-256 prefix of event payload |
@@ -286,7 +291,30 @@ Traces each shipment's final compliance conclusion to its temperature readings, 
 
 ---
 
-### 2.13 `ShipmentStateHistory` (Audit / Event History Table)
+### 2.13 `ComplianceReview` (Persisted Operational Audit & Deviation Resolution Table)
+Preserves the original `ExcursionReport` without overwriting history while recording independent operational QA audit findings, evidence IDs, and corrective disposition overrides.
+
+| Field Name | Type | Required | Allowed Values / Format | Units | Uniqueness | Validation Rule |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `review_id` | `STRING` | Required | `REV-2026-\d{6}` | N/A | Primary Key (Unique) | Matches regex `^REV-2026-\d{6}$` |
+| `report_id` | `STRING` | Required | `EXCR-2026-\d{6}` | N/A | Foreign Key (Unique 1:1) | Must exist in `ExcursionReport.report_id` |
+| `shipment_id` | `STRING` | Required | `SHP-2026-\d{6}` | N/A | Foreign Key (Unique 1:1) | Must exist in `Shipment.shipment_id` |
+| `canonical_policy_id` | `STRING` | Required | `POL-2026-\d{4}` | N/A | Foreign Key | Must exist in `ThresholdPolicy.policy_id` and match `Shipment.primary_product_id` |
+| `policy_version` | `INTEGER` | Required | `>= 1` | N/A | Non-unique | Matches `ThresholdPolicy.version` |
+| `evidence_ids` | `STRING` | Required | Semicolon-delimited IDs | N/A | Non-unique | References `report_id`, `reading_id`, or `custody_event_id` evidence |
+| `anomaly_type` | `ENUM` | Required | `NONE`, `LOGGER_NOT_ASSIGNED`, `PRODUCT_THRESHOLD_MISMATCH`, `MISSING_DATA_SILENTLY_PASSED`, `CUSTODY_GAP_NOT_FLAGGED`, `CROSS_SHIPMENT_EXCURSION_CALC` | N/A | Non-unique | Derived strictly from operational records |
+| `original_status` | `ENUM` | Required | Same as `ExcursionReport.compliance_status` | N/A | Non-unique | Matches `ExcursionReport.compliance_status` |
+| `original_disposition` | `ENUM` | Required | Same as `ExcursionReport.disposition_decision` | N/A | Non-unique | Matches `ExcursionReport.disposition_decision` |
+| `audited_status` | `ENUM` | Required | Valid compliance status enum | N/A | Non-unique | Reconstructed from canonical policy, telemetry grid, and custody handoffs |
+| `audited_disposition` | `ENUM` | Required | Valid disposition enum | N/A | Non-unique | Effective post-audit disposition decision |
+| `override_applied` | `BOOLEAN` | Required | `true`, `false` | N/A | Non-unique | `true` if `anomaly_type != 'NONE'` or status/disposition changed |
+| `resolution_state` | `ENUM` | Required | `CONFIRMED_AS_REPORTED`, `OVERRIDDEN_CORRECTED` | N/A | Non-unique | Valid resolution enum |
+| `reviewed_by_actor` | `ENUM` | Required | `LOGISTICS_ANALYST`, `OPERATIONS_MANAGER` | N/A | Non-unique | Valid actor enum |
+| `reviewed_at_utc` | `ISO_DATETIME` | Required | ISO-8601 UTC | `UTC` | Non-unique | `>= ExcursionReport.evaluated_at_utc` |
+
+---
+
+### 2.14 `ShipmentStateHistory` (Audit / Event History Table)
 Explicitly persists every state transition of a `Shipment` so history is never overwritten (Rule 4).
 
 | Field Name | Type | Required | Allowed Values / Format | Units | Uniqueness | Validation Rule |

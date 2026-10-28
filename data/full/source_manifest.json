@@ -26,7 +26,8 @@
     "CustodyEvent": 15000,
     "TemperatureReading": 93395,
     "ExcursionReport": 5000,
-    "ShipmentStateHistory": 30000,
+    "ComplianceReview": 5000,
+    "ShipmentStateHistory": 30200,
     "GroundTruth": 5000
   },
   "files": {
@@ -94,25 +95,25 @@
       "table": "Shipment",
       "format": "csv",
       "row_count": 5000,
-      "sha256": "5f952a5377f4d89332eabd998186fbdcae9530cf9ebae0b7f1b8869cba7b6b17"
+      "sha256": "915cea083cfbac17db82aa08365fe82bc5bf28655a58ccfd16051e802712fc5b"
     },
     "json/Shipment.json": {
       "table": "Shipment",
       "format": "json",
       "row_count": 5000,
-      "sha256": "b8b6483f36889e96be2b538c76561e759b4c3fa23583cb0573a8ee221ab1ed83"
+      "sha256": "f39e106c292a5f6345e6ad2412ab23dbcf1c1e965c33d49114ccc0aee85f1379"
     },
     "csv/ShipmentLot.csv": {
       "table": "ShipmentLot",
       "format": "csv",
       "row_count": 6000,
-      "sha256": "9416de99e4ae11ea265885e3147bb7e58a44e4e56560f9225b705b9fba35e8e8"
+      "sha256": "fa4181166a42437785d6ad831ec59b2e9005d23c6b9842fb68b3d3c66cedb69b"
     },
     "json/ShipmentLot.json": {
       "table": "ShipmentLot",
       "format": "json",
       "row_count": 6000,
-      "sha256": "8c7c0459e70ff8deb577f04ddf70ae3120504fd57460be57fd39fa751f761fea"
+      "sha256": "69c4e225392017dd34aa1e7007b82a0f022ed697448a06ee47c9316e8c0ec792"
     },
     "csv/ShipmentLogger.csv": {
       "table": "ShipmentLogger",
@@ -142,67 +143,79 @@
       "table": "CustodyEvent",
       "format": "csv",
       "row_count": 15000,
-      "sha256": "db50149d4b5ec6f7ab02500b6d6cc7b0019232af42c8673cd171d16669d5c47c"
+      "sha256": "3c38f288dbcc8a9a33945196b6ba47994d7ad9ef2beaabf422e055778b911a9a"
     },
     "json/CustodyEvent.json": {
       "table": "CustodyEvent",
       "format": "json",
       "row_count": 15000,
-      "sha256": "87bc0acc3c8fc341cc145a92d801b6d09402576a8599e0abef01da9bc7b5b9d5"
+      "sha256": "7ba0e7183e7c60aeab4464458b3724c6a828a85cafe5bf3974fd5be7e662e8e0"
     },
     "csv/TemperatureReading.csv": {
       "table": "TemperatureReading",
       "format": "csv",
       "row_count": 93395,
-      "sha256": "71d58b0b5944da92148c83086ddbbe98604471fb3e033db2ecc51f2ac04cd55c"
+      "sha256": "fd09146ce30192dbd5b0f15060866445c3be007a3a38520ee89b45abec79c128"
     },
     "json/TemperatureReading.json": {
       "table": "TemperatureReading",
       "format": "json",
       "row_count": 93395,
-      "sha256": "760ff56b02f415a9cf093318f66dbc4afee1e197121ac733f0a4f5cf1f49beb3"
+      "sha256": "ed9e9857d82e1cd56b2685bfe778666e6b4af3384090cb480bbbc91afae171ee"
     },
     "csv/ExcursionReport.csv": {
       "table": "ExcursionReport",
       "format": "csv",
       "row_count": 5000,
-      "sha256": "4caa4a70a93cd9d79affa7a36761aa87d88c5712e00b027ee1fbc86bfa5b5967"
+      "sha256": "8eb6d0491336e3c61fe7141411cbaa23f3bf3e14847ca5539ceed1ef06e388ba"
     },
     "json/ExcursionReport.json": {
       "table": "ExcursionReport",
       "format": "json",
       "row_count": 5000,
-      "sha256": "1001e7b03e058d86a185ef4a1f0c2afcf3288a1a18d417bd87785cde3fb151de"
+      "sha256": "5ba8c36e3acc0355251090e8a972b16a6e3db858fe9c3a81a199e4849732dacf"
+    },
+    "csv/ComplianceReview.csv": {
+      "table": "ComplianceReview",
+      "format": "csv",
+      "row_count": 5000,
+      "sha256": "35609c61b872d789630fa88696750cc28050ddc6b430d24ca2de9dd81a24edc9"
+    },
+    "json/ComplianceReview.json": {
+      "table": "ComplianceReview",
+      "format": "json",
+      "row_count": 5000,
+      "sha256": "abdc43dcdddea6cf16c62999b54cd5ad4099ca68d4ba1e09dce27145e2996e75"
     },
     "csv/ShipmentStateHistory.csv": {
       "table": "ShipmentStateHistory",
       "format": "csv",
-      "row_count": 30000,
-      "sha256": "bb50fb2ec37e86459bf9981ad9fb4696e7549213ca3cc67e97316acd72f2b986"
+      "row_count": 30200,
+      "sha256": "bdc0b253d8291403e3bf8d9400a6044e3d06434266cf452e360f32805c5d4db1"
     },
     "json/ShipmentStateHistory.json": {
       "table": "ShipmentStateHistory",
       "format": "json",
-      "row_count": 30000,
-      "sha256": "21938b24e50b0b5239e87fc97b2d796c3048569c0b6a84c34404b95463dc31af"
+      "row_count": 30200,
+      "sha256": "f2e78df8001cee38059c70420bd26bdcd98bd4529bb44bce8ef6963f9b8256e6"
     },
     "ground_truth/ground_truth.csv": {
       "table": "GroundTruth",
       "format": "csv",
       "row_count": 5000,
-      "sha256": "d4f21d5360be8c05fc1bba75f9addc943f9dd0c9ee9d35bba237ecda11b5556b"
+      "sha256": "194b0769280c73f5102bba8b34980f9613318b30c918331b2c048598d1f11439"
     },
     "ground_truth/ground_truth.json": {
       "table": "GroundTruth",
       "format": "json",
       "row_count": 5000,
-      "sha256": "e343c36570cd14228ee604cc6ca849618a4c430e7e3aa351d6d0565f4ccf1c4e"
+      "sha256": "b52a5e051b1540696daddf7cbae766cafa0899223383d10ff08b44d1995eb1bd"
     },
     "sql/seed_data.sql": {
       "table": "ALL_INPUT_TABLES",
       "format": "sql",
-      "row_count": 175775,
-      "sha256": "723e08e39b395cb5abc4113765bb15303ffe85855cb4af5260ae2855827b0108"
+      "row_count": 180975,
+      "sha256": "100f0a537602847389d889fe6ec6276122cda3379f94eaac338b55fab6b29a20"
     }
   }
 }

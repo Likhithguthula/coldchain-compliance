@@ -1,11 +1,11 @@
 """
-End-to-End Orchestrator & CLI Runner for the YottaFlex Cold-Chain Shipment Compliance
+End-to-End Orchestrator & CLI Runner for the ColdChain Compliance — Shipment Monitoring
 & Deviation Management Platform.
 
 Executes:
 1. Starter Dataset Generation (250 shipments, 100 loggers, seed=20261022) -> data/starter/
 2. Full Baseline Dataset Generation (5,000 shipments, 1,000 loggers, seed=20261022) -> data/full/
-3. Step 8 Structural, Referential, Arithmetic, Lifecycle & Anomaly Audit Validation
+3. Step 8 Structural, Referential, Arithmetic, Lifecycle, Manifest & Anomaly Audit Validation
 4. Step 10 Fixed-Seed Reproducibility Proof (two independent generations compared by SHA-256)
 5. Generates docs/VALIDATION_SUMMARY.md with comprehensive metrics and checksum tables.
 """
@@ -14,12 +14,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
 from collections import Counter
 from pathlib import Path
 from typing import Any, Dict
 
-from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets
+from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets, verify_manifest_checksums
 from src.validator import DatasetValidator, verify_reproducibility
 
 
@@ -43,7 +44,7 @@ def write_validation_markdown(
         f"- **Full Dataset Scale**: `5,000` Shipments, `1,000` Loggers, `10-minute` Telemetry Interval",
         f"- **Starter Dataset Scale**: `250` Shipments, `100` Loggers, `10-minute` Telemetry Interval",
         f"- **Overall Structural & Referential Validation**: `{'PASSED (100%)' if val_summary['overall_passed'] else 'FAILED'}`",
-        f"- **Two-Run Deterministic Reproducibility (Step 10)**: `{'PASSED (100% SHA-256 Match)' if repro_summary['reproducible_100_pct'] else 'FAILED'}`",
+        f"- **Two-Run Deterministic Reproducibility (Step 10)**: `{'PASSED (100% SHA-256 Match across ' + str(repro_summary['files_compared']) + ' manifest-listed files)' if repro_summary['reproducible_100_pct'] else 'FAILED'}`",
         "",
         "---",
         "",
@@ -66,6 +67,7 @@ def write_validation_markdown(
         "CustodyEvent": "`CUST-2026-0000001`",
         "TemperatureReading": "`TEMP-LOG-SHP-2026-000001-01-20260102060000`",
         "ExcursionReport": "`EXCR-2026-000001`",
+        "ComplianceReview": "`REV-2026-000001`",
         "ShipmentStateHistory": "`STHIST-2026-0000001`",
         "GroundTruth": "`SHP-2026-000001` (Separate File)",
     }
@@ -83,13 +85,13 @@ def write_validation_markdown(
         "",
         "| Validation Check Category | Status | Verified Metric / Coverage | Error Count |",
         "| :--- | :--- | :--- | ---: |",
-        f"| Primary Key Uniqueness & Nomenclature | `{'PASS' if val_summary['primary_key_and_nomenclature']['passed'] else 'FAIL'}` | All 13 entity/event tables verified against regex rules | `{val_summary['primary_key_and_nomenclature']['error_count']}` |",
-        f"| Foreign Key Referential Integrity | `{'PASS' if val_summary['foreign_key_integrity']['passed'] else 'FAIL'}` | `{val_summary['foreign_key_integrity']['total_fk_references_verified']:,}` foreign-key links verified | `{val_summary['foreign_key_integrity']['error_count']}` |",
+        f"| Primary Key Uniqueness & Nomenclature | `{'PASS' if val_summary['primary_key_and_nomenclature']['passed'] else 'FAIL'}` | All 14 entity/event/review tables verified against regex rules | `{val_summary['primary_key_and_nomenclature']['error_count']}` |",
+        f"| Foreign Key & Compound Join Integrity | `{'PASS' if val_summary['foreign_key_integrity']['passed'] else 'FAIL'}` | `{val_summary['foreign_key_integrity']['total_fk_references_verified']:,}` foreign-key & compound links verified | `{val_summary['foreign_key_integrity']['error_count']}` |",
         f"| Allowed Enumerations | `{'PASS' if val_summary['allowed_enums']['passed'] else 'FAIL'}` | `{val_summary['allowed_enums']['enum_values_verified']:,}` enum fields verified | `{val_summary['allowed_enums']['error_count']}` |",
-        f"| Chronological Date & Timestamp Ordering | `{'PASS' if val_summary['date_ordering']['passed'] else 'FAIL'}` | `{val_summary['date_ordering']['chronological_assertions_verified']:,}` date/time intervals verified | `{val_summary['date_ordering']['error_count']}` |",
-        f"| Arithmetic Reconciliation | `{'PASS' if val_summary['arithmetic_reconciliation']['passed'] else 'FAIL'}` | `{val_summary['arithmetic_reconciliation']['reconciled_shipment_values']:,}` shipments & `{val_summary['arithmetic_reconciliation']['reconciled_route_stop_dwells']:,}` stops reconciled | `{val_summary['arithmetic_reconciliation']['error_count']}` |",
-        f"| Lifecycle State Transition History | `{'PASS' if val_summary['lifecycle_transitions']['passed'] else 'FAIL'}` | `{val_summary['lifecycle_transitions']['verified_shipment_state_chains']:,}` immutable state chains verified | `{val_summary['lifecycle_transitions']['error_count']}` |",
-        f"| Independent Anomaly & Edge-Case Audit | `{'PASS' if val_summary['independent_anomaly_audit']['passed'] else 'FAIL'}` | `{val_summary['independent_anomaly_audit']['ground_truth_exact_matches']:,} / {val_summary['independent_anomaly_audit']['total_shipments_audited']:,}` exact ground-truth matches | `{val_summary['independent_anomaly_audit']['mismatch_count']}` |",
+        f"| Chronological Date, Calibration & Lot Window Ordering | `{'PASS' if val_summary['date_ordering']['passed'] else 'FAIL'}` | `{val_summary['date_ordering']['chronological_assertions_verified']:,}` date/time, calibration & non-overlap checks verified | `{val_summary['date_ordering']['error_count']}` |",
+        f"| Arithmetic Reconciliation | `{'PASS' if val_summary['arithmetic_reconciliation']['passed'] else 'FAIL'}` | `{val_summary['arithmetic_reconciliation']['reconciled_shipment_values']:,}` shipments, `{val_summary['arithmetic_reconciliation']['reconciled_route_stop_dwells']:,}` stops & `{val_summary['arithmetic_reconciliation']['reconciled_custody_handover_gaps']:,}` custody handoffs reconciled | `{val_summary['arithmetic_reconciliation']['error_count']}` |",
+        f"| Complete Lifecycle State Transition History | `{'PASS' if val_summary['lifecycle_transitions']['passed'] else 'FAIL'}` | `{val_summary['lifecycle_transitions']['verified_shipment_state_chains']:,}` complete state chains reconciled with final `Shipment.lifecycle_state` | `{val_summary['lifecycle_transitions']['error_count']}` |",
+        f"| Independent Operational Anomaly & Edge-Case Audit | `{'PASS' if val_summary['independent_anomaly_audit']['passed'] else 'FAIL'}` | `{val_summary['independent_anomaly_audit']['ground_truth_exact_matches']:,} / {val_summary['independent_anomaly_audit']['total_shipments_audited']:,}` exact matches (`100.0%` post-audit review accuracy) | `{val_summary['independent_anomaly_audit']['mismatch_count']}` |",
         "",
         "---",
         "",
@@ -123,6 +125,7 @@ def write_validation_markdown(
         "| Evaluation Metric | Measured Value | Interpretation |",
         "| :--- | ---: | :--- |",
         f"| **Ground-Truth Reconstruction Accuracy** | `{audit_info['ground_truth_reconstruction_accuracy_pct']:.2f}%` (`{audit_info['ground_truth_exact_matches']:,} / {audit_info['total_shipments_audited']:,}`) | Independent audit engine reconstructs 100% of true statuses & dispositions from source records |",
+        f"| **Post-Audit `ComplianceReview` Accuracy** | `{audit_info['post_audit_review_accuracy_pct']:.2f}%` | Persisted `ComplianceReview` records and corrected `Shipment.lifecycle_state` match 100% of audited outcomes |",
         f"| **Original Pre-Audit Report Decision Accuracy** | `{audit_info['original_report_decision_accuracy_pct']:.2f}%` | Reflects the intentionally injected negative process defects in `ExcursionReport` before audit correction |",
         f"| **Original Pre-Audit Disposition Accuracy** | `{audit_info['original_report_disposition_accuracy_pct']:.2f}%` | Reflects dispositions prior to independent audit override |",
         f"| **Edge-Case Detection Precision** | `{audit_info['edge_case_detection_precision_pct']:.2f}%` | Zero false-positive anomaly accusations on normal/operational shipments |",
@@ -133,9 +136,9 @@ def write_validation_markdown(
         "",
         "---",
         "",
-        "## 4. Compliance Status Distribution (Ground Truth vs. Reported)",
+        "## 4. Compliance Status Distribution (Post-Audit Ground Truth vs. Pre-Audit ExcursionReport)",
         "",
-        "| Compliance Status | Ground Truth Count | Reported Count (Before Audit Correction) |",
+        "| Compliance Status | Audited / Ground-Truth Count (`ComplianceReview`) | Pre-Audit `ExcursionReport` Count (Before Override) |",
         "| :--- | ---: | ---: |",
     ])
 
@@ -175,7 +178,7 @@ def main() -> None:
 
     t_start = time.time()
     print("=" * 78)
-    print("YOTTAFLEX COLD-CHAIN COMPLIANCE & DEVIATION MANAGEMENT PIPELINE")
+    print("COLDCHAIN COMPLIANCE — SHIPMENT MONITORING & DEVIATION MANAGEMENT PIPELINE")
     print("=" * 78)
 
     # 1. Generate & export starter dataset (250 shipments, 100 loggers)
@@ -183,6 +186,7 @@ def main() -> None:
     gen_starter = SyntheticDataGenerator(seed=args.seed, scale="starter")
     ds_starter = gen_starter.generate_all()
     man_starter = export_datasets(ds_starter, Path("data/starter"), seed=args.seed, scale="starter", export_sql=True)
+    starter_manifest_check = verify_manifest_checksums(Path("data/starter"))
     print(f"  -> Exported starter dataset to data/starter/ ({len(ds_starter['TemperatureReading']):,} temperature readings)")
 
     # 2. Generate & export full dataset (5,000 shipments, 1,000 loggers)
@@ -203,6 +207,10 @@ def main() -> None:
     print("\n[Step 3/4] Running Step 8 Validation Suite on Full Dataset (5,000 shipments)...")
     validator = DatasetValidator(ds_full)
     val_summary = validator.run_all_checks()
+    val_summary["starter_manifest_checksum_verification"] = starter_manifest_check
+    if not starter_manifest_check["passed"]:
+        val_summary["overall_passed"] = False
+
     print(f"  -> Overall Validation Passed: {val_summary['overall_passed']}")
     print(f"  -> Foreign Key Links Verified: {val_summary['foreign_key_integrity']['total_fk_references_verified']:,}")
     print(f"  -> Ground-Truth Exact Matches: {val_summary['independent_anomaly_audit']['ground_truth_exact_matches']:,} / {val_summary['independent_anomaly_audit']['total_shipments_audited']:,}")
@@ -211,7 +219,7 @@ def main() -> None:
     # 4. Run Step 10 two-run reproducibility verification
     print(f"\n[Step 4/4] Running Step 10 Two-Run Reproducibility Verification (seed={args.seed})...")
     repro_summary = verify_reproducibility(seed=args.seed, scale="starter")
-    print(f"  -> 100% Checksum & Row-Count Match across {repro_summary['files_compared']} files: {repro_summary['reproducible_100_pct']}")
+    print(f"  -> 100% Checksum & Row-Count Match across {repro_summary['files_compared']} manifest-listed files: {repro_summary['reproducible_100_pct']}")
 
     # Save JSON and Markdown validation reports
     report_json_path = Path("docs/VALIDATION_REPORT.json")
@@ -239,10 +247,13 @@ def main() -> None:
 
     elapsed = time.time() - t_start
     print("\n" + "=" * 78)
-    print(f"PIPELINE COMPLETED SUCCESSFULLY IN {elapsed:.2f}s")
+    print(f"PIPELINE COMPLETED IN {elapsed:.2f}s")
     print(f"  - Validation Summary Markdown : {report_md_path.resolve()}")
     print(f"  - Validation Report JSON      : {report_json_path.resolve()}")
     print("=" * 78)
+
+    if not val_summary["overall_passed"] or not repro_summary["reproducible_100_pct"]:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

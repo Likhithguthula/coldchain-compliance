@@ -26,8 +26,11 @@ Run via:
 
 from __future__ import annotations
 
+import copy
+import io
 import sqlite3
 import tempfile
+from contextlib import redirect_stdout
 from pathlib import Path
 import unittest
 from src.compliance_engine import (
@@ -37,7 +40,14 @@ from src.compliance_engine import (
     compute_mkt_celsius,
     parse_iso_utc,
 )
-from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets, open_sqlite_db
+from src.generator import (
+    DEFAULT_SEED,
+    SyntheticDataGenerator,
+    export_datasets,
+    open_sqlite_db,
+    verify_manifest_checksums,
+)
+from src.inspector import inspect_shipment, list_exception_shipments, print_portfolio_summary
 from src.validator import DatasetValidator, verify_reproducibility, verify_sqlite_foreign_key_enforcement
 
 
@@ -438,6 +448,210 @@ class TestColdChainCompliancePlatform(unittest.TestCase):
                     )
             finally:
                 conn.close()
+
+    def test_17_priority1_operational_inspector_never_uses_ground_truth(self) -> None:
+        """
+        Priority 1 Regression:
+        Verify that `print_portfolio_summary`, `list_exception_shipments`, and `inspect_shipment`
+        compute operational audit findings strictly from master/transaction/event tables and
+        `ExcursionReport` / `ComplianceReview`, producing identical output even when `GroundTruth`
+        is deleted or tampered with `TAMPERED_LABEL`.
+        """
+        ds_no_gt = {k: copy.deepcopy(v) for k, v in self.datasets.items() if k != "GroundTruth"}
+        buf1 = io.StringIO()
+        with redirect_stdout(buf1):
+            print_portfolio_summary(ds_no_gt, seed=DEFAULT_SEED, scale="starter")
+            list_exception_shipments(ds_no_gt, limit=10)
+            inspect_shipment(ds_no_gt, "SHP-2026-000018")
+        out_no_gt = buf1.getvalue()
+        self.assertIn("LOGGER_NOT_ASSIGNED", out_no_gt)
+
+        ds_tampered = copy.deepcopy(self.datasets)
+        for g in ds_tampered["GroundTruth"]:
+            g["edge_case_type"] = "TAMPERED_LABEL"
+            g["true_compliance_status"] = "TAMPERED_STATUS"
+            g["true_disposition_decision"] = "TAMPERED_DECISION"
+            g["root_cause_summary"] = "TAMPERED_SUMMARY"
+
+        buf2 = io.StringIO()
+        with redirect_stdout(buf2):
+            print_portfolio_summary(ds_tampered, seed=DEFAULT_SEED, scale="starter")
+            list_exception_shipments(ds_tampered, limit=10)
+            inspect_shipment(ds_tampered, "SHP-2026-000018")
+        out_tampered = buf2.getvalue()
+
+        self.assertNotIn("TAMPERED_", out_tampered)
+        self.assertEqual(out_no_gt, out_tampered)
+
+    def test_18_priority2_missing_grid_and_off_grid_readings_prevent_compliant_release(self) -> None:
+        """
+        Priority 2 Regression:
+        20-minute trip (06:00 to 06:20) expecting 10-minute grid points at 00, 10, 20.
+        Readings supplied at 00, 05, 15, 20 (missing expected grid point 06:10, and containing off-grid points 05, 15),
+        with max_telemetry_gap_min=20.
+        Must set telemetry_gap_flagged=True and route to NON_COMPLIANT_MISSING_DATA / QUARANTINE_HOLD.
+        """
+        policy = make_test_policy(max_telemetry_gap_min=20)
+        readings = [
+            ReadingPoint("R1", "LOG-1", "SHP-1", 1, "2026-01-02T06:00:00Z", 5.0, 0.2, 0),
+            ReadingPoint("R2", "LOG-1", "SHP-1", 2, "2026-01-02T06:05:00Z", 5.0, 0.2, 5),
+            ReadingPoint("R3", "LOG-1", "SHP-1", 3, "2026-01-02T06:15:00Z", 5.0, 0.2, 10),
+            ReadingPoint("R4", "LOG-1", "SHP-1", 4, "2026-01-02T06:20:00Z", 5.0, 0.2, 5),
+        ]
+        res = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc="2026-01-02T06:00:00Z",
+            actual_arrival_utc="2026-01-02T06:20:00Z",
+            policy=policy,
+            readings=readings,
+            custody_handover_gaps_min=[10],
+            sampling_interval_min=10,
+        )
+        self.assertEqual(res.expected_reading_count, 3)
+        self.assertEqual(res.missing_reading_count, 1)
+        self.assertTrue(res.telemetry_gap_flagged)
+        self.assertEqual(res.compliance_status, "NON_COMPLIANT_MISSING_DATA")
+        self.assertEqual(res.disposition_decision, "QUARANTINE_HOLD")
+
+    def test_19_priority3_excursion_duration_bounded_by_trip_window_and_hand_calculated_cases(self) -> None:
+        """
+        Priority 3 Regression:
+        Verify piecewise-constant hold on [t_i, t_next) clipped to [actual_departure_utc, actual_arrival_utc]:
+        1) 10-minute trip (06:00 to 06:10) with readings at 06:00 and 06:10 both at 9.0C -> 10 min (not 20 min).
+        2) Zero-duration trip (06:00 to 06:00) with reading at 06:00 at 9.0C -> 0 min (not 10 min).
+        3) First-reading-only breach on 20-minute trip (06:00=9.0C, 06:10=5.0C, 06:20=5.0C) -> 10 min.
+        4) Last-reading-only breach on 20-minute trip (06:00=5.0C, 06:10=5.0C, 06:20=9.0C) -> 0 min duration,
+           flagged via uncertainty_borderline_flag -> QA_MANUAL_REVIEW.
+        5) Non-finite (NaN / Inf) temperature or uncertainty raises ValueError.
+        """
+        policy = make_test_policy(min_temp_c=2.0, max_temp_c=8.0, critical_high_temp_c=12.0, max_mkt_c=10.0)
+
+        # Case 1: 10-minute trip, both endpoints breaching at 9.0C -> 10 minutes
+        r_10m = [
+            ReadingPoint("R1", "LOG-1", "SHP-1", 1, "2026-01-02T06:00:00Z", 9.0, 0.2, 0),
+            ReadingPoint("R2", "LOG-1", "SHP-1", 2, "2026-01-02T06:10:00Z", 9.0, 0.2, 10),
+        ]
+        res_10m = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc="2026-01-02T06:00:00Z",
+            actual_arrival_utc="2026-01-02T06:10:00Z",
+            policy=policy,
+            readings=r_10m,
+            custody_handover_gaps_min=[5],
+        )
+        self.assertEqual(res_10m.total_excursion_duration_min, 10)
+        self.assertEqual(res_10m.max_single_excursion_min, 10)
+
+        # Case 2: 0-minute trip -> 0 excursion minutes
+        r_0m = [ReadingPoint("R1", "LOG-1", "SHP-1", 1, "2026-01-02T06:00:00Z", 9.0, 0.2, 0)]
+        res_0m = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc="2026-01-02T06:00:00Z",
+            actual_arrival_utc="2026-01-02T06:00:00Z",
+            policy=policy,
+            readings=r_0m,
+            custody_handover_gaps_min=[5],
+        )
+        self.assertEqual(res_0m.total_excursion_duration_min, 0)
+        self.assertEqual(res_0m.max_single_excursion_min, 0)
+        self.assertEqual(res_0m.compliance_status, "INVESTIGATION_REQUIRED")
+
+        # Case 3: First-reading-only breach on 20-minute trip -> 10 minutes
+        r_first = [
+            ReadingPoint("R1", "LOG-1", "SHP-1", 1, "2026-01-02T06:00:00Z", 9.0, 0.2, 0),
+            ReadingPoint("R2", "LOG-1", "SHP-1", 2, "2026-01-02T06:10:00Z", 5.0, 0.2, 10),
+            ReadingPoint("R3", "LOG-1", "SHP-1", 3, "2026-01-02T06:20:00Z", 5.0, 0.2, 10),
+        ]
+        res_first = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc="2026-01-02T06:00:00Z",
+            actual_arrival_utc="2026-01-02T06:20:00Z",
+            policy=policy,
+            readings=r_first,
+            custody_handover_gaps_min=[5],
+        )
+        self.assertEqual(res_first.total_excursion_duration_min, 10)
+
+        # Case 4: Last-reading-only breach at arrival endpoint -> 0 duration, routed to QA_MANUAL_REVIEW
+        r_last = [
+            ReadingPoint("R1", "LOG-1", "SHP-1", 1, "2026-01-02T06:00:00Z", 5.0, 0.2, 0),
+            ReadingPoint("R2", "LOG-1", "SHP-1", 2, "2026-01-02T06:10:00Z", 5.0, 0.2, 10),
+            ReadingPoint("R3", "LOG-1", "SHP-1", 3, "2026-01-02T06:20:00Z", 9.0, 0.2, 10),
+        ]
+        res_last = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc="2026-01-02T06:00:00Z",
+            actual_arrival_utc="2026-01-02T06:20:00Z",
+            policy=policy,
+            readings=r_last,
+            custody_handover_gaps_min=[5],
+        )
+        self.assertEqual(res_last.total_excursion_duration_min, 0)
+        self.assertTrue(res_last.uncertainty_borderline_flag)
+        self.assertEqual(res_last.compliance_status, "INVESTIGATION_REQUIRED")
+        self.assertEqual(res_last.disposition_decision, "QA_MANUAL_REVIEW")
+
+        # Case 5: NaN temperature rejected from release (routes to NON_COMPLIANT_MISSING_DATA / QUARANTINE_HOLD,
+        # and compute_mkt_celsius raises ValueError on NaN)
+        r_nan = [
+            ReadingPoint("R1", "LOG-1", "SHP-1", 1, "2026-01-02T06:00:00Z", float("nan"), 0.2, 0),
+            ReadingPoint("R2", "LOG-1", "SHP-1", 2, "2026-01-02T06:10:00Z", 5.0, 0.2, 10),
+        ]
+        res_nan = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc="2026-01-02T06:00:00Z",
+            actual_arrival_utc="2026-01-02T06:10:00Z",
+            policy=policy,
+            readings=r_nan,
+            custody_handover_gaps_min=[5],
+        )
+        self.assertTrue(res_nan.telemetry_gap_flagged)
+        self.assertEqual(res_nan.compliance_status, "NON_COMPLIANT_MISSING_DATA")
+        self.assertEqual(res_nan.disposition_decision, "QUARANTINE_HOLD")
+        with self.assertRaises(ValueError):
+            compute_mkt_celsius([5.0, float("nan")])
+
+    def test_20_priority4_and_priority5_validator_catches_expired_logger_deleted_history_and_state_mismatch(self) -> None:
+        """
+        Priority 4 & Priority 5 Regression:
+        Verify that `DatasetValidator` catches all 3 reproduced mutations from the review:
+        1) Expiring a logger calibration before the shipment (`calibration_expiry_date = 2025-12-01`).
+        2) Deleting `ShipmentStateHistory` rows for a shipment.
+        3) Changing `Shipment.lifecycle_state` so it disagrees with `ShipmentStateHistory` and `ComplianceReview`.
+        """
+        # Mutation 1: Expired logger calibration before shipment
+        ds_exp_logger = copy.deepcopy(self.datasets)
+        ds_exp_logger["Logger"][0]["calibration_expiry_date"] = "2025-12-01"
+        res_exp_logger = DatasetValidator(ds_exp_logger).run_all_checks()
+        self.assertFalse(res_exp_logger["date_ordering"]["passed"])
+        self.assertFalse(res_exp_logger["overall_passed"])
+
+        # Mutation 2: Delete ShipmentStateHistory rows for SHP-2026-000001
+        ds_del_hist = copy.deepcopy(self.datasets)
+        ds_del_hist["ShipmentStateHistory"] = [
+            ev for ev in ds_del_hist["ShipmentStateHistory"] if ev["shipment_id"] != "SHP-2026-000001"
+        ]
+        res_del_hist = DatasetValidator(ds_del_hist).run_all_checks()
+        self.assertFalse(res_del_hist["lifecycle_transitions"]["passed"])
+        self.assertFalse(res_del_hist["overall_passed"])
+
+        # Mutation 3: Change Shipment.lifecycle_state so it disagrees with history & disposition
+        ds_bad_state = copy.deepcopy(self.datasets)
+        ds_bad_state["Shipment"][0]["lifecycle_state"] = "CLOSED_REJECTED"
+        res_bad_state = DatasetValidator(ds_bad_state).run_all_checks()
+        self.assertFalse(res_bad_state["lifecycle_transitions"]["passed"])
+        self.assertFalse(res_bad_state["overall_passed"])
+
+    def test_21_manifest_checksum_verification_catches_corrupted_csv_export(self) -> None:
+        """
+        Verify that `verify_manifest_checksums` detects any tampering or corruption of exported CSV files.
+        """
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            base = Path(tmp_dir)
+            export_datasets(self.datasets, base, seed=DEFAULT_SEED, scale="starter", export_sql=True)
+            check_ok = verify_manifest_checksums(base)
+            self.assertTrue(check_ok["passed"])
+
+            # Corrupt csv/Shipment.csv
+            shp_csv = base / "csv" / "Shipment.csv"
+            shp_csv.write_text(shp_csv.read_text(encoding="utf-8") + "\nCORRUPTED_ROW\n", encoding="utf-8")
+            check_bad = verify_manifest_checksums(base)
+            self.assertFalse(check_bad["passed"])
+            self.assertGreater(check_bad["error_count"], 0)
 
 
 if __name__ == "__main__":

@@ -16,26 +16,27 @@
         "CustodyEvent": 15000,
         "TemperatureReading": 93395,
         "ExcursionReport": 5000,
-        "ShipmentStateHistory": 30000
+        "ComplianceReview": 5000,
+        "ShipmentStateHistory": 30200
       },
       "error_count": 0,
       "sample_errors": []
     },
     "foreign_key_integrity": {
       "passed": true,
-      "total_fk_references_verified": 314700,
+      "total_fk_references_verified": 329900,
       "error_count": 0,
       "sample_errors": []
     },
     "allowed_enums": {
       "passed": true,
-      "enum_values_verified": 20020,
+      "enum_values_verified": 30020,
       "error_count": 0,
       "sample_errors": []
     },
     "date_ordering": {
       "passed": true,
-      "chronological_assertions_verified": 26400,
+      "chronological_assertions_verified": 46260,
       "error_count": 0,
       "sample_errors": []
     },
@@ -43,6 +44,7 @@
       "passed": true,
       "reconciled_shipment_values": 5000,
       "reconciled_route_stop_dwells": 15000,
+      "reconciled_custody_handover_gaps": 15000,
       "error_count": 0,
       "sample_errors": []
     },
@@ -57,7 +59,8 @@
       "total_shipments_audited": 5000,
       "ground_truth_exact_matches": 5000,
       "ground_truth_reconstruction_accuracy_pct": 100.0,
-      "original_report_decision_accuracy_pct": 96.0,
+      "post_audit_review_accuracy_pct": 100.0,
+      "original_report_decision_accuracy_pct": 96.4,
       "original_report_disposition_accuracy_pct": 96.0,
       "edge_case_detection_precision_pct": 100.0,
       "edge_case_detection_recall_pct": 100.0,
@@ -74,6 +77,12 @@
       "orphan_temperature_readings_detected": 150,
       "mismatch_count": 0,
       "sample_mismatches": []
+    },
+    "starter_manifest_checksum_verification": {
+      "passed": true,
+      "files_verified": 31,
+      "error_count": 0,
+      "errors": []
     }
   },
   "reproducibility_verification": {
@@ -86,22 +95,30 @@
       "foreign_key_check_violations": 0,
       "invalid_fk_insert_rejected": true
     },
-    "files_compared": 29,
+    "files_compared": 31,
     "comparisons": [
+      {
+        "file": "csv/ComplianceReview.csv",
+        "row_count_run1": 250,
+        "row_count_run2": 250,
+        "sha256_run1": "0debcc6bb9ad5c39740995559e767fdc5625bbf3208916741d2c355f74838331",
+        "sha256_run2": "0debcc6bb9ad5c39740995559e767fdc5625bbf3208916741d2c355f74838331",
+        "identical": true
+      },
       {
         "file": "csv/CustodyEvent.csv",
         "row_count_run1": 750,
         "row_count_run2": 750,
-        "sha256_run1": "77c206d5bf4336bdf4af31f1aa613b002e5a8e56338b627bb820405391dd0ee7",
-        "sha256_run2": "77c206d5bf4336bdf4af31f1aa613b002e5a8e56338b627bb820405391dd0ee7",
+        "sha256_run1": "20bf3c160091e7ce2705371afcaa4aff69b24d1553d88f288e6e6748b6362aee",
+        "sha256_run2": "20bf3c160091e7ce2705371afcaa4aff69b24d1553d88f288e6e6748b6362aee",
         "identical": true
       },
       {
         "file": "csv/ExcursionReport.csv",
         "row_count_run1": 250,
         "row_count_run2": 250,
-        "sha256_run1": "cad94a248b125bd8e6172bb401df20cd306a6e5154315d721ac588b1238fb3f9",
-        "sha256_run2": "cad94a248b125bd8e6172bb401df20cd306a6e5154315d721ac588b1238fb3f9",
+        "sha256_run1": "9d15e0a72c72252cd262e8594ac56d90fa5e044a8bf76c99f5c1d5ce5693464f",
+        "sha256_run2": "9d15e0a72c72252cd262e8594ac56d90fa5e044a8bf76c99f5c1d5ce5693464f",
         "identical": true
       },
       {
@@ -148,8 +165,8 @@
         "file": "csv/Shipment.csv",
         "row_count_run1": 250,
         "row_count_run2": 250,
-        "sha256_run1": "6d69b15e1aa4eb60544341a666035123d8d2c0eb2be95da5ea0d9903d0f296d6",
-        "sha256_run2": "6d69b15e1aa4eb60544341a666035123d8d2c0eb2be95da5ea0d9903d0f296d6",
+        "sha256_run1": "04d0a93f83f3eeb44a6064425ef1bda319518839d41dd61acb0692a073416e9a",
+        "sha256_run2": "04d0a93f83f3eeb44a6064425ef1bda319518839d41dd61acb0692a073416e9a",
         "identical": true
       },
       {
@@ -164,24 +181,24 @@
         "file": "csv/ShipmentLot.csv",
         "row_count_run1": 300,
         "row_count_run2": 300,
-        "sha256_run1": "9ff23e525a0ce2ede651273c0ee01fccfc4fcd7f0fda50332dfb002de2bdcf26",
-        "sha256_run2": "9ff23e525a0ce2ede651273c0ee01fccfc4fcd7f0fda50332dfb002de2bdcf26",
+        "sha256_run1": "990a3e98c293fc0ba18719d17fca65d3796327e1da01b4981fe5d32c8194b0fa",
+        "sha256_run2": "990a3e98c293fc0ba18719d17fca65d3796327e1da01b4981fe5d32c8194b0fa",
         "identical": true
       },
       {
         "file": "csv/ShipmentStateHistory.csv",
-        "row_count_run1": 1500,
-        "row_count_run2": 1500,
-        "sha256_run1": "029cc41b652a1773b7240568d0fc4c7a6dcc907f6ec3dd9863930df038f04fd4",
-        "sha256_run2": "029cc41b652a1773b7240568d0fc4c7a6dcc907f6ec3dd9863930df038f04fd4",
+        "row_count_run1": 1509,
+        "row_count_run2": 1509,
+        "sha256_run1": "fab005a1ea4f9419aca89322b579a3b78cd31681d530c1b0ae8ac3799dcce827",
+        "sha256_run2": "fab005a1ea4f9419aca89322b579a3b78cd31681d530c1b0ae8ac3799dcce827",
         "identical": true
       },
       {
         "file": "csv/TemperatureReading.csv",
         "row_count_run1": 4666,
         "row_count_run2": 4666,
-        "sha256_run1": "a0247ad20577de044bfc6d90cfdb2f94c3a80c0a25f83f9e77a32c2bd1a0d9a2",
-        "sha256_run2": "a0247ad20577de044bfc6d90cfdb2f94c3a80c0a25f83f9e77a32c2bd1a0d9a2",
+        "sha256_run1": "2352137d4938aac451fe1acfc3ec0e4521ba8d6292103f077a12e72f74179966",
+        "sha256_run2": "2352137d4938aac451fe1acfc3ec0e4521ba8d6292103f077a12e72f74179966",
         "identical": true
       },
       {
@@ -196,32 +213,40 @@
         "file": "ground_truth/ground_truth.csv",
         "row_count_run1": 250,
         "row_count_run2": 250,
-        "sha256_run1": "359d944c25421f3385c16de1dee6cb52dc527b1b0a4ce5df80ffb3f48c3771d9",
-        "sha256_run2": "359d944c25421f3385c16de1dee6cb52dc527b1b0a4ce5df80ffb3f48c3771d9",
+        "sha256_run1": "8c7c7c60bf963f74db84c3e83e0ea700eec76acf9166faa2d16984e788d91c16",
+        "sha256_run2": "8c7c7c60bf963f74db84c3e83e0ea700eec76acf9166faa2d16984e788d91c16",
         "identical": true
       },
       {
         "file": "ground_truth/ground_truth.json",
         "row_count_run1": 250,
         "row_count_run2": 250,
-        "sha256_run1": "9191f546898f5f41401cacd0dd8df6eb28f686e296afed4fcf36ae8ec345eef6",
-        "sha256_run2": "9191f546898f5f41401cacd0dd8df6eb28f686e296afed4fcf36ae8ec345eef6",
+        "sha256_run1": "fb980eef24ba318f616fbeff420737d4c21d6f2b50819998b5a23367dcf4ad5c",
+        "sha256_run2": "fb980eef24ba318f616fbeff420737d4c21d6f2b50819998b5a23367dcf4ad5c",
+        "identical": true
+      },
+      {
+        "file": "json/ComplianceReview.json",
+        "row_count_run1": 250,
+        "row_count_run2": 250,
+        "sha256_run1": "2ec59d9a3352f950284898b42c1d4d40704a2e3277e65a51a23beda7ffe2e761",
+        "sha256_run2": "2ec59d9a3352f950284898b42c1d4d40704a2e3277e65a51a23beda7ffe2e761",
         "identical": true
       },
       {
         "file": "json/CustodyEvent.json",
         "row_count_run1": 750,
         "row_count_run2": 750,
-        "sha256_run1": "a9e8a92ddf20d1c388101b8a1762eaacde35c71679f456673d020c9675c5a845",
-        "sha256_run2": "a9e8a92ddf20d1c388101b8a1762eaacde35c71679f456673d020c9675c5a845",
+        "sha256_run1": "59e9658eb7981307843d43277041915cf7a34c899cc520544f1bbd99d782c7dd",
+        "sha256_run2": "59e9658eb7981307843d43277041915cf7a34c899cc520544f1bbd99d782c7dd",
         "identical": true
       },
       {
         "file": "json/ExcursionReport.json",
         "row_count_run1": 250,
         "row_count_run2": 250,
-        "sha256_run1": "c7ec5d6c2f402de09af49a069d9e96642d5ef33a791c9a766dba8bb200eca014",
-        "sha256_run2": "c7ec5d6c2f402de09af49a069d9e96642d5ef33a791c9a766dba8bb200eca014",
+        "sha256_run1": "9f613b7ee514c0cafeeabe829d643ed58b8e85863ec23cfea6cc4847210c9099",
+        "sha256_run2": "9f613b7ee514c0cafeeabe829d643ed58b8e85863ec23cfea6cc4847210c9099",
         "identical": true
       },
       {
@@ -268,8 +293,8 @@
         "file": "json/Shipment.json",
         "row_count_run1": 250,
         "row_count_run2": 250,
-        "sha256_run1": "c19925c327f97e75d1e048c94505ef101ad0f7947e0bf082e2721142c8caac39",
-        "sha256_run2": "c19925c327f97e75d1e048c94505ef101ad0f7947e0bf082e2721142c8caac39",
+        "sha256_run1": "171d8549e622e8cad396c6fa7dfd376a4c078eab07ec9d5231fb4fa574a2d463",
+        "sha256_run2": "171d8549e622e8cad396c6fa7dfd376a4c078eab07ec9d5231fb4fa574a2d463",
         "identical": true
       },
       {
@@ -284,24 +309,24 @@
         "file": "json/ShipmentLot.json",
         "row_count_run1": 300,
         "row_count_run2": 300,
-        "sha256_run1": "3bf4074bc2daa9d2133735a924edb15c3bfae3e25a6e2e4951db1bd16f3c0905",
-        "sha256_run2": "3bf4074bc2daa9d2133735a924edb15c3bfae3e25a6e2e4951db1bd16f3c0905",
+        "sha256_run1": "51bb5f17146ee1b741a417e7fca5d6b10d1b21b007bd077c00f308c9f86eab91",
+        "sha256_run2": "51bb5f17146ee1b741a417e7fca5d6b10d1b21b007bd077c00f308c9f86eab91",
         "identical": true
       },
       {
         "file": "json/ShipmentStateHistory.json",
-        "row_count_run1": 1500,
-        "row_count_run2": 1500,
-        "sha256_run1": "d738cec234597730bbfb1f363ff4e3946f4b11315dd8026f0a349f9872d2cfef",
-        "sha256_run2": "d738cec234597730bbfb1f363ff4e3946f4b11315dd8026f0a349f9872d2cfef",
+        "row_count_run1": 1509,
+        "row_count_run2": 1509,
+        "sha256_run1": "c25617b7a852df29338fb7f72135ec66d823987ab6e8b6430bb260bff2f3fd09",
+        "sha256_run2": "c25617b7a852df29338fb7f72135ec66d823987ab6e8b6430bb260bff2f3fd09",
         "identical": true
       },
       {
         "file": "json/TemperatureReading.json",
         "row_count_run1": 4666,
         "row_count_run2": 4666,
-        "sha256_run1": "553eeb1f6e8c14260e908163bae56602c50eb91f5b581802a7d53f4df294b265",
-        "sha256_run2": "553eeb1f6e8c14260e908163bae56602c50eb91f5b581802a7d53f4df294b265",
+        "sha256_run1": "a79fe45247834506c8007a1222e5d0ba232640f2451e525ae029e6597fd19c81",
+        "sha256_run2": "a79fe45247834506c8007a1222e5d0ba232640f2451e525ae029e6597fd19c81",
         "identical": true
       },
       {
@@ -314,10 +339,10 @@
       },
       {
         "file": "sql/seed_data.sql",
-        "row_count_run1": 8893,
-        "row_count_run2": 8893,
-        "sha256_run1": "850dea532dbb087c636658e08a1f27f13d8b28d82c0fc5d8b959fd2b78d210c3",
-        "sha256_run2": "850dea532dbb087c636658e08a1f27f13d8b28d82c0fc5d8b959fd2b78d210c3",
+        "row_count_run1": 9152,
+        "row_count_run2": 9152,
+        "sha256_run1": "7bdf385b5076da8f900ea047a0fad970fc7d8c22a7cea22eb75ff8cb5757b5d2",
+        "sha256_run2": "7bdf385b5076da8f900ea047a0fad970fc7d8c22a7cea22eb75ff8cb5757b5d2",
         "identical": true
       }
     ]

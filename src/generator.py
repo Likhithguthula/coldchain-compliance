@@ -474,6 +474,7 @@ class SyntheticDataGenerator:
         self.custody_events: List[Dict[str, Any]] = []
         self.temperature_readings: List[Dict[str, Any]] = []
         self.excursion_reports: List[Dict[str, Any]] = []
+        self.compliance_reviews: List[Dict[str, Any]] = []
         self.shipment_state_history: List[Dict[str, Any]] = []
         self.ground_truth: List[Dict[str, Any]] = []
 
@@ -505,6 +506,7 @@ class SyntheticDataGenerator:
             "CustodyEvent": self.custody_events,
             "TemperatureReading": self.temperature_readings,
             "ExcursionReport": self.excursion_reports,
+            "ComplianceReview": self.compliance_reviews,
             "ShipmentStateHistory": self.shipment_state_history,
             "GroundTruth": self.ground_truth,
         }
@@ -714,8 +716,10 @@ class SyntheticDataGenerator:
             actual_dep_dt = planned_dep_dt + timedelta(minutes=self.rng.choice([0, 10, 20]))
             actual_arr_dt = actual_dep_dt + timedelta(minutes=trip_duration_min)
 
-            # Select product & canonical threshold policy
-            product_row = self.products[(shp_idx - 1) % len(self.products)]
+            # Select product & canonical threshold policy (stratified across 100-shipment scenario blocks
+            # so all 10 products experience all 11 scenario categories in the full dataset)
+            prod_idx = ((shp_idx - 1) + ((shp_idx - 1) // 100)) % len(self.products)
+            product_row = self.products[prod_idx]
             prod_id = product_row["product_id"]
             true_policy = self.canonical_policy_by_product[prod_id]
 
@@ -858,6 +862,7 @@ class SyntheticDataGenerator:
                 cust_counter += 1
                 cust_id = f"CUST-2026-{cust_counter:07d}"
                 custody_handover_gaps.append(gap_min)
+                handoff_start_dt = ev_dt - timedelta(minutes=gap_min)
                 true_gap_flag = gap_min > CUSTODY_GAP_THRESHOLD_MIN
                 # If EDGE_CUSTODY_GAP_NOT_FLAGGED: silently suppress the flag in the custody record!
                 recorded_gap_flag = False if is_custody_gap_edge else true_gap_flag
@@ -871,6 +876,7 @@ class SyntheticDataGenerator:
                     "event_type": ev_type,
                     "from_actor_role": from_role,
                     "to_actor_role": to_role,
+                    "handoff_started_utc": format_iso_utc(handoff_start_dt),
                     "event_timestamp_utc": format_iso_utc(ev_dt),
                     "handover_gap_min": gap_min,
                     "custody_gap_flagged": recorded_gap_flag,
@@ -1084,18 +1090,17 @@ class SyntheticDataGenerator:
                 true_eval.total_excursion_duration_min,
             )
 
-            # Determine final shipment lifecycle state from reported disposition decision
+            # Determine pre-audit shipment lifecycle state from reported disposition decision
             if reported_eval.disposition_decision in ("AUTO_RELEASE", "RELEASE_WITH_STABILITY_DEDUCTION"):
-                final_state = "CLOSED_RELEASED"
+                pre_audit_state = "CLOSED_RELEASED"
             elif reported_eval.disposition_decision == "REJECT_DESTROY":
-                final_state = "CLOSED_REJECTED"
+                pre_audit_state = "CLOSED_REJECTED"
             else:
-                final_state = "CLOSED_QUARANTINED"
+                pre_audit_state = "CLOSED_QUARANTINED"
 
             eval_dt = actual_arr_dt + timedelta(minutes=15)
 
-            # Append Shipment record
-            self.shipments.append({
+            shipment_row = {
                 "shipment_id": shipment_id,
                 "primary_product_id": prod_id,
                 "assigned_policy_id": assigned_policy.policy_id,
@@ -1112,11 +1117,10 @@ class SyntheticDataGenerator:
                 "actual_arrival_utc": format_iso_utc(actual_arr_dt),
                 "total_distance_km": route_info["distance_km"],
                 "declared_value_usd": declared_value_usd,
-                "lifecycle_state": final_state,
-            })
+                "lifecycle_state": pre_audit_state,
+            }
 
-            # Append ExcursionReport record
-            self.excursion_reports.append({
+            report_row = {
                 "report_id": report_id,
                 "shipment_id": shipment_id,
                 "policy_id_evaluated": assigned_policy.policy_id,
@@ -1138,7 +1142,55 @@ class SyntheticDataGenerator:
                 "first_breach_reading_id": reported_eval.first_breach_reading_id,
                 "evaluated_by_actor": reported_eval.evaluated_by_actor,
                 "evaluated_at_utc": format_iso_utc(eval_dt),
+            }
+            self.excursion_reports.append(report_row)
+
+            # Run operational QA audit on the shipment's raw records and ExcursionReport (Priority 4)
+            assigned_logger_ids = [logger_id] if has_assigned_logger else []
+            shp_custody_rows = self.custody_events[-len(cust_events_spec):]
+            audit_res = ComplianceEngine.audit_shipment_record(
+                shipment=shipment_row,
+                report=report_row,
+                policies=list(self.policy_by_id.values()),
+                assigned_logger_ids=assigned_logger_ids,
+                readings=trip_reading_points,
+                custody_events=shp_custody_rows,
+            )
+
+            review_id = f"REV-2026-{shp_idx:06d}"
+            review_dt = eval_dt + timedelta(minutes=10)
+
+            if audit_res.audited_disposition_decision in ("AUTO_RELEASE", "RELEASE_WITH_STABILITY_DEDUCTION"):
+                post_audit_state = "CLOSED_RELEASED"
+            elif audit_res.audited_disposition_decision == "REJECT_DESTROY":
+                post_audit_state = "CLOSED_REJECTED"
+            else:
+                post_audit_state = "CLOSED_QUARANTINED"
+
+            override_applied = audit_res.requires_corrective_override
+            resolution_state = "OVERRIDDEN_CORRECTED" if override_applied else "CONFIRMED_AS_REPORTED"
+
+            self.compliance_reviews.append({
+                "review_id": review_id,
+                "report_id": report_id,
+                "shipment_id": shipment_id,
+                "canonical_policy_id": true_policy.policy_id,
+                "policy_version": 1,
+                "evidence_ids": audit_res.evidence_ids,
+                "anomaly_type": audit_res.detected_anomaly_type,
+                "original_status": reported_eval.compliance_status,
+                "original_disposition": reported_eval.disposition_decision,
+                "audited_status": audit_res.audited_compliance_status,
+                "audited_disposition": audit_res.audited_disposition_decision,
+                "override_applied": override_applied,
+                "resolution_state": resolution_state,
+                "reviewed_by_actor": "OPERATIONS_MANAGER" if override_applied else "LOGISTICS_ANALYST",
+                "reviewed_at_utc": format_iso_utc(review_dt),
             })
+
+            # Update Shipment.lifecycle_state to reflect final post-audit state
+            shipment_row["lifecycle_state"] = post_audit_state
+            self.shipments.append(shipment_row)
 
             # Persist explicit state transitions in ShipmentStateHistory (Rule 4: never overwrite history)
             transitions = [
@@ -1147,8 +1199,18 @@ class SyntheticDataGenerator:
                 ("PACKED", "IN_TRANSIT", actual_dep_dt, "CARRIER_OPERATOR", "DEPARTED_ORIGIN_FACILITY"),
                 ("IN_TRANSIT", "DELIVERED", actual_arr_dt, "WAREHOUSE_OPERATOR", "ARRIVED_DESTINATION_DOCK"),
                 ("DELIVERED", "EVALUATED", eval_dt - timedelta(minutes=5), "LOGISTICS_ANALYST", "TELEMETRY_POLICY_EVALUATED"),
-                ("EVALUATED", final_state, eval_dt, "OPERATIONS_MANAGER", f"DISPOSITION_{reported_eval.disposition_decision}"),
+                ("EVALUATED", pre_audit_state, eval_dt, "OPERATIONS_MANAGER", f"DISPOSITION_{reported_eval.disposition_decision}"),
             ]
+            if override_applied and post_audit_state != pre_audit_state:
+                transitions.append(
+                    (
+                        pre_audit_state,
+                        post_audit_state,
+                        review_dt,
+                        "OPERATIONS_MANAGER",
+                        f"AUDIT_OVERRIDE_{audit_res.detected_anomaly_type}",
+                    )
+                )
             for seq_s, (p_state, n_state, chg_dt, actor_r, reason_c) in enumerate(transitions, start=1):
                 sthist_counter += 1
                 self.shipment_state_history.append({
@@ -1313,6 +1375,173 @@ def export_datasets(
     return manifest
 
 
+def verify_manifest_checksums(input_dir: Path | str) -> Dict[str, Any]:
+    """
+    Verify that every file listed in `source_manifest.json` under `input_dir` exists on disk
+    and matches both its recorded SHA-256 checksum and row count.
+    """
+    base_dir = Path(input_dir)
+    manifest_path = base_dir / "source_manifest.json"
+    if not manifest_path.exists():
+        return {
+            "passed": False,
+            "files_verified": 0,
+            "error_count": 1,
+            "errors": [f"Missing source_manifest.json in {base_dir}"],
+        }
+
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+
+    files_meta = manifest.get("files", {})
+    errors: List[str] = []
+    verified = 0
+
+    for rel_path, meta in sorted(files_meta.items()):
+        fpath = base_dir / rel_path
+        if not fpath.exists():
+            errors.append(f"Missing exported file: {rel_path}")
+            continue
+
+        actual_sha = compute_file_sha256(fpath)
+        expected_sha = meta.get("sha256")
+        if actual_sha != expected_sha:
+            errors.append(
+                f"SHA-256 mismatch for {rel_path}: expected {expected_sha[:16]}..., got {actual_sha[:16]}..."
+            )
+            continue
+        verified += 1
+
+    return {
+        "passed": len(errors) == 0 and verified > 0,
+        "files_verified": verified,
+        "error_count": len(errors),
+        "errors": errors,
+    }
+
+
+def load_datasets_from_dir(input_dir: Path | str) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Load exported dataset tables from `input_dir/json/*.json` (and `ground_truth/ground_truth.json` if present),
+    or fall back to parsing `input_dir/csv/*.csv` with proper type coercion.
+    Also verifies `csv/*.csv` against `json/*.json` or parses directly from CSV when testing CSV exports.
+    """
+    base_dir = Path(input_dir)
+    csv_dir = base_dir / "csv"
+    gt_csv = base_dir / "ground_truth" / "ground_truth.csv"
+
+    int_fields = {
+        "version",
+        "max_single_excursion_min",
+        "max_cumulative_excursion_min",
+        "max_telemetry_gap_min",
+        "max_custody_gap_min",
+        "validated_hold_hours",
+        "initial_quantity_units",
+        "remaining_stability_budget_min",
+        "sampling_interval_min",
+        "battery_pct",
+        "quantity_units",
+        "sequence_no",
+        "dwell_duration_min",
+        "handover_gap_min",
+        "elapsed_since_prev_min",
+        "expected_reading_count",
+        "actual_reading_count",
+        "missing_reading_count",
+        "total_excursion_duration_min",
+        "policy_version",
+        "true_excursion_duration_min",
+        "reported_excursion_duration_min",
+        "true_max_single_excursion_min",
+        "true_telemetry_gap_min",
+        "true_custody_gap_min",
+    }
+    float_fields = {
+        "target_temp_c",
+        "unit_value_usd",
+        "min_temp_c",
+        "max_temp_c",
+        "critical_low_temp_c",
+        "critical_high_temp_c",
+        "max_mkt_c",
+        "insulation_r_value",
+        "payload_capacity_liters",
+        "calibration_uncertainty_c",
+        "total_distance_km",
+        "declared_value_usd",
+        "ambient_temp_c",
+        "temperature_c",
+        "ambient_estimate_c",
+        "min_recorded_temp_c",
+        "max_recorded_temp_c",
+        "mean_kinetic_temp_c",
+    }
+    bool_fields = {
+        "humidity_sensitive",
+        "reusable",
+        "has_cold_storage",
+        "custody_gap_flagged",
+        "seal_intact",
+        "is_excursion_point",
+        "telemetry_gap_flagged",
+        "uncertainty_borderline_flag",
+        "override_applied",
+        "is_injected_edge_case",
+    }
+
+    def _parse_csv_file(csv_path: Path) -> List[Dict[str, Any]]:
+        rows: List[Dict[str, Any]] = []
+        with open(csv_path, "r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for raw in reader:
+                row: Dict[str, Any] = {}
+                for k, v in raw.items():
+                    if v == "" or v is None:
+                        row[k] = None
+                    elif k in bool_fields:
+                        row[k] = v.strip().lower() in ("true", "1", "yes")
+                    elif k in int_fields:
+                        row[k] = int(v)
+                    elif k in float_fields:
+                        row[k] = float(v)
+                    else:
+                        row[k] = v
+                rows.append(row)
+        return rows
+
+    table_names = [
+        "Product",
+        "ThresholdPolicy",
+        "Packaging",
+        "Lot",
+        "Logger",
+        "Shipment",
+        "ShipmentLot",
+        "ShipmentLogger",
+        "RouteStop",
+        "CustodyEvent",
+        "TemperatureReading",
+        "ExcursionReport",
+        "ComplianceReview",
+        "ShipmentStateHistory",
+    ]
+    datasets: Dict[str, List[Dict[str, Any]]] = {}
+    for tbl in table_names:
+        cpath = csv_dir / f"{tbl}.csv"
+        if cpath.exists():
+            datasets[tbl] = _parse_csv_file(cpath)
+        else:
+            datasets[tbl] = []
+
+    if gt_csv.exists():
+        datasets["GroundTruth"] = _parse_csv_file(gt_csv)
+    else:
+        datasets["GroundTruth"] = []
+
+    return datasets
+
+
 def open_sqlite_db(sqlite_db_path: Path | str) -> sqlite3.Connection:
     """
     Open a connection to the Cold-Chain Compliance SQLite database with
@@ -1455,6 +1684,7 @@ def _write_sql_and_sqlite(
             event_type TEXT NOT NULL,
             from_actor_role TEXT NOT NULL,
             to_actor_role TEXT NOT NULL,
+            handoff_started_utc TEXT NOT NULL,
             event_timestamp_utc TEXT NOT NULL,
             handover_gap_min INTEGER NOT NULL,
             custody_gap_flagged INTEGER NOT NULL,
@@ -1497,6 +1727,23 @@ def _write_sql_and_sqlite(
             evaluated_by_actor TEXT NOT NULL,
             evaluated_at_utc TEXT NOT NULL
         );""",
+        """CREATE TABLE ComplianceReview (
+            review_id TEXT PRIMARY KEY,
+            report_id TEXT UNIQUE NOT NULL REFERENCES ExcursionReport(report_id),
+            shipment_id TEXT UNIQUE NOT NULL REFERENCES Shipment(shipment_id),
+            canonical_policy_id TEXT NOT NULL REFERENCES ThresholdPolicy(policy_id),
+            policy_version INTEGER NOT NULL,
+            evidence_ids TEXT NOT NULL,
+            anomaly_type TEXT NOT NULL,
+            original_status TEXT NOT NULL,
+            original_disposition TEXT NOT NULL,
+            audited_status TEXT NOT NULL,
+            audited_disposition TEXT NOT NULL,
+            override_applied INTEGER NOT NULL,
+            resolution_state TEXT NOT NULL,
+            reviewed_by_actor TEXT NOT NULL,
+            reviewed_at_utc TEXT NOT NULL
+        );""",
         """CREATE TABLE ShipmentStateHistory (
             state_event_id TEXT PRIMARY KEY,
             shipment_id TEXT NOT NULL REFERENCES Shipment(shipment_id),
@@ -1528,6 +1775,7 @@ def _write_sql_and_sqlite(
         "CustodyEvent",
         "TemperatureReading",
         "ExcursionReport",
+        "ComplianceReview",
         "ShipmentStateHistory",
     ]
 

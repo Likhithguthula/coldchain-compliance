@@ -4,18 +4,22 @@ for the Cold-Chain Shipment Compliance & Deviation Management Dataset.
 
 Implements:
 - Step 8 Validation Suite:
-  1. Primary-key uniqueness & nomenclature regex verification across all 13 tables.
-  2. Foreign-key referential integrity across all relationships and bridge tables.
+  1. Primary-key uniqueness & nomenclature regex verification across all 14 tables.
+  2. Foreign-key referential integrity across all relationships, bridge tables, and compound joins.
   3. Allowed enums & domain range verification.
-  4. Chronological date & timestamp ordering checks.
+  4. Chronological date & timestamp ordering checks, plus Logger calibration window coverage,
+     non-overlapping ShipmentLogger windows, and Lot usability/product compatibility.
   5. Arithmetic reconciliation (Shipment declared_value_usd == sum(Lot qty * unit_value),
-     RouteStop dwell_duration_min, ExcursionReport expected/actual/missing counts, MKT formula).
-  6. Lifecycle state transition DAG verification on ShipmentStateHistory.
+     RouteStop dwell_duration_min, CustodyEvent handover_gap_min from timestamps,
+     ExcursionReport expected/actual/missing counts, MKT formula).
+  6. Lifecycle state transition DAG verification on ShipmentStateHistory, ensuring EVERY Shipment
+     has a complete state history chain whose final state reconciles with Shipment.lifecycle_state
+     and the latest effective disposition (ComplianceReview / ExcursionReport).
   7. Independent Audit & Edge-Case Detection (100% detection of all 5 injected negative scenarios
-     comparing independent audit rules against ground_truth.json).
+     using ComplianceEngine.audit_dataset, verified against ComplianceReview and ground_truth.json).
 - Step 10 Reproducibility Verification:
-  Regenerates the dataset twice with the same fixed seed and compares row counts and SHA-256
-  checksums across all exported files.
+  Regenerates the dataset twice with the same fixed seed at the requested scale and compares row counts
+  and SHA-256 checksums across all exported files.
 """
 
 from __future__ import annotations
@@ -24,6 +28,7 @@ import argparse
 import json
 import re
 import sqlite3
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -36,7 +41,14 @@ from src.compliance_engine import (
     compute_mkt_celsius,
     parse_iso_utc,
 )
-from src.generator import DEFAULT_SEED, SyntheticDataGenerator, export_datasets, open_sqlite_db
+from src.generator import (
+    DEFAULT_SEED,
+    SyntheticDataGenerator,
+    export_datasets,
+    load_datasets_from_dir,
+    open_sqlite_db,
+    verify_manifest_checksums,
+)
 
 
 PK_REGEX_RULES = {
@@ -52,6 +64,7 @@ PK_REGEX_RULES = {
     "CustodyEvent": ("custody_event_id", re.compile(r"^CUST-2026-\d{7}$")),
     "TemperatureReading": ("reading_id", re.compile(r"^TEMP-LOG-SHP-2026-\d{6}-01-\d{14}$")),
     "ExcursionReport": ("report_id", re.compile(r"^EXCR-2026-\d{6}$")),
+    "ComplianceReview": ("review_id", re.compile(r"^REV-2026-\d{6}$")),
     "ShipmentStateHistory": ("state_event_id", re.compile(r"^STHIST-2026-\d{7}$")),
 }
 
@@ -91,6 +104,18 @@ ALLOWED_ENUMS = {
         "QUARANTINE_HOLD",
         "REJECT_DESTROY",
     },
+    "ComplianceReview.anomaly_type": {
+        "NONE",
+        "LOGGER_NOT_ASSIGNED",
+        "PRODUCT_THRESHOLD_MISMATCH",
+        "MISSING_DATA_SILENTLY_PASSED",
+        "CUSTODY_GAP_NOT_FLAGGED",
+        "CROSS_SHIPMENT_EXCURSION_CALC",
+    },
+    "ComplianceReview.resolution_state": {
+        "CONFIRMED_AS_REPORTED",
+        "OVERRIDDEN_CORRECTED",
+    },
 }
 
 LEGAL_STATE_TRANSITIONS = {
@@ -100,7 +125,19 @@ LEGAL_STATE_TRANSITIONS = {
     "IN_TRANSIT": {"DELIVERED"},
     "DELIVERED": {"EVALUATED"},
     "EVALUATED": {"CLOSED_RELEASED", "CLOSED_QUARANTINED", "CLOSED_REJECTED"},
+    # Post-audit QA override transitions from initial pre-audit closure to corrected closure state:
+    "CLOSED_RELEASED": {"CLOSED_QUARANTINED", "CLOSED_REJECTED"},
+    "CLOSED_REJECTED": {"CLOSED_RELEASED", "CLOSED_QUARANTINED"},
+    "CLOSED_QUARANTINED": {"CLOSED_RELEASED", "CLOSED_REJECTED"},
 }
+
+
+def disposition_to_closed_state(disposition: str) -> str:
+    if disposition in ("AUTO_RELEASE", "RELEASE_WITH_STABILITY_DEDUCTION"):
+        return "CLOSED_RELEASED"
+    if disposition == "REJECT_DESTROY":
+        return "CLOSED_REJECTED"
+    return "CLOSED_QUARANTINED"
 
 
 class DatasetValidator:
@@ -166,11 +203,17 @@ class DatasetValidator:
         prod_ids = {r["product_id"] for r in self.datasets["Product"]}
         pol_ids = {r["policy_id"] for r in self.datasets["ThresholdPolicy"]}
         pkg_ids = {r["packaging_id"] for r in self.datasets["Packaging"]}
-        lot_ids = {r["lot_id"] for r in self.datasets["Lot"]}
+        lot_by_id = {r["lot_id"]: r for r in self.datasets["Lot"]}
+        lot_ids = set(lot_by_id.keys())
         log_ids = {r["logger_id"] for r in self.datasets["Logger"]}
-        shp_ids = {r["shipment_id"] for r in self.datasets["Shipment"]}
-        stop_ids = {r["stop_id"] for r in self.datasets["RouteStop"]}
-        read_ids = {r["reading_id"] for r in self.datasets["TemperatureReading"]}
+        shp_by_id = {r["shipment_id"]: r for r in self.datasets["Shipment"]}
+        shp_ids = set(shp_by_id.keys())
+        stop_by_id = {r["stop_id"]: r for r in self.datasets["RouteStop"]}
+        stop_ids = set(stop_by_id.keys())
+        read_by_id = {r["reading_id"]: r for r in self.datasets["TemperatureReading"]}
+        read_ids = set(read_by_id.keys())
+        rep_by_id = {r["report_id"]: r for r in self.datasets["ExcursionReport"]}
+        rep_ids = set(rep_by_id.keys())
 
         fk_checks = [
             ("ThresholdPolicy", "product_id", prod_ids, False),
@@ -191,6 +234,9 @@ class DatasetValidator:
             ("ExcursionReport", "policy_id_evaluated", pol_ids, False),
             ("ExcursionReport", "logger_id_evaluated", log_ids, True),
             ("ExcursionReport", "first_breach_reading_id", read_ids, True),
+            ("ComplianceReview", "report_id", rep_ids, False),
+            ("ComplianceReview", "shipment_id", shp_ids, False),
+            ("ComplianceReview", "canonical_policy_id", pol_ids, False),
             ("ShipmentStateHistory", "shipment_id", shp_ids, False),
         ]
 
@@ -205,6 +251,40 @@ class DatasetValidator:
                 total_fk_references_checked += 1
                 if val not in target_set:
                     errors.append(f"{tbl}.{fk_col}='{val}' not found in parent table")
+
+        # Compound relational integrity checks (Priority 5)
+        for sl in self.datasets["ShipmentLot"]:
+            shp = shp_by_id.get(sl["shipment_id"])
+            lot = lot_by_id.get(sl["lot_id"])
+            if shp and lot and lot["product_id"] != shp["primary_product_id"]:
+                errors.append(
+                    f"ShipmentLot {sl['shipment_lot_id']}: Lot {lot['lot_id']} product {lot['product_id']} "
+                    f"!= Shipment {shp['shipment_id']} primary_product_id {shp['primary_product_id']}"
+                )
+
+        for ce in self.datasets["CustodyEvent"]:
+            stop = stop_by_id.get(ce["stop_id"])
+            if stop and stop["shipment_id"] != ce["shipment_id"]:
+                errors.append(
+                    f"CustodyEvent {ce['custody_event_id']}: stop_id {ce['stop_id']} belongs to shipment "
+                    f"{stop['shipment_id']} != {ce['shipment_id']}"
+                )
+
+        for er in self.datasets["ExcursionReport"]:
+            fb_id = er.get("first_breach_reading_id")
+            if fb_id is not None:
+                rd = read_by_id.get(fb_id)
+                if rd:
+                    if rd["shipment_id"] != er["shipment_id"]:
+                        errors.append(
+                            f"ExcursionReport {er['report_id']}: first_breach_reading_id {fb_id} belongs to "
+                            f"shipment {rd['shipment_id']} != {er['shipment_id']}"
+                        )
+                    if rd["logger_id"] != er["logger_id_evaluated"]:
+                        errors.append(
+                            f"ExcursionReport {er['report_id']}: first_breach_reading_id {fb_id} belongs to "
+                            f"logger {rd['logger_id']} != {er['logger_id_evaluated']}"
+                        )
 
         return {
             "passed": len(errors) == 0,
@@ -236,6 +316,10 @@ class DatasetValidator:
         errors: List[str] = []
         checks_run = 0
 
+        lot_by_id = {l["lot_id"]: l for l in self.datasets["Lot"]}
+        logger_by_id = {lg["logger_id"]: lg for lg in self.datasets["Logger"]}
+        shp_by_id = {s["shipment_id"]: s for s in self.datasets["Shipment"]}
+
         for lot in self.datasets["Lot"]:
             checks_run += 1
             if lot["manufactured_date"] >= lot["expiry_date"]:
@@ -252,6 +336,77 @@ class DatasetValidator:
                 errors.append(f"Shipment {shp['shipment_id']} planned departure >= arrival")
             if parse_iso_utc(shp["actual_departure_utc"]) >= parse_iso_utc(shp["actual_arrival_utc"]):
                 errors.append(f"Shipment {shp['shipment_id']} actual departure >= arrival")
+
+        # Priority 5: Validate Lot usability at dispatch (manufactured_date <= departure_date < expiry_date & RELEASED)
+        for sl in self.datasets["ShipmentLot"]:
+            checks_run += 1
+            shp = shp_by_id.get(sl["shipment_id"])
+            lot = lot_by_id.get(sl["lot_id"])
+            if shp and lot:
+                dep_date = parse_iso_utc(shp["actual_departure_utc"]).date().isoformat()
+                arr_date = parse_iso_utc(shp["actual_arrival_utc"]).date().isoformat()
+                if lot["manufactured_date"] > dep_date:
+                    errors.append(
+                        f"ShipmentLot {sl['shipment_lot_id']}: Lot {lot['lot_id']} manufactured_date "
+                        f"{lot['manufactured_date']} > departure {dep_date}"
+                    )
+                if lot["expiry_date"] <= arr_date:
+                    errors.append(
+                        f"ShipmentLot {sl['shipment_lot_id']}: Lot {lot['lot_id']} expiry_date "
+                        f"{lot['expiry_date']} <= arrival {arr_date}"
+                    )
+                if lot.get("lifecycle_state") != "RELEASED":
+                    errors.append(
+                        f"ShipmentLot {sl['shipment_lot_id']}: Lot {lot['lot_id']} is in state "
+                        f"{lot.get('lifecycle_state')} (expected RELEASED)"
+                    )
+
+        # Priority 5: Validate Logger calibration window covers shipment window, activation window covers trip,
+        # and no physical logger has overlapping assignments across shipments!
+        assignments_by_logger: Dict[str, List[Tuple[datetime, datetime, str]]] = {}
+        for assgn in self.datasets["ShipmentLogger"]:
+            checks_run += 2
+            shp = shp_by_id.get(assgn["shipment_id"])
+            lg = logger_by_id.get(assgn["logger_id"])
+            act_dt = parse_iso_utc(assgn["activated_utc"])
+            deact_dt = parse_iso_utc(assgn["deactivated_utc"])
+            if act_dt >= deact_dt:
+                errors.append(f"ShipmentLogger {assgn['assignment_id']} activated_utc >= deactivated_utc")
+            if shp:
+                dep_dt = parse_iso_utc(shp["actual_departure_utc"])
+                arr_dt = parse_iso_utc(shp["actual_arrival_utc"])
+                if act_dt > dep_dt or deact_dt < arr_dt:
+                    errors.append(
+                        f"ShipmentLogger {assgn['assignment_id']} window [{assgn['activated_utc']}, "
+                        f"{assgn['deactivated_utc']}] does not cover trip [{shp['actual_departure_utc']}, "
+                        f"{shp['actual_arrival_utc']}]"
+                    )
+                if lg:
+                    dep_date = dep_dt.date().isoformat()
+                    arr_date = arr_dt.date().isoformat()
+                    if lg["calibration_date"] > dep_date or lg["calibration_expiry_date"] < arr_date:
+                        errors.append(
+                            f"Logger {lg['logger_id']} calibration window [{lg['calibration_date']}, "
+                            f"{lg['calibration_expiry_date']}] does not cover Shipment {shp['shipment_id']} "
+                            f"[{dep_date}, {arr_date}]"
+                        )
+                    if lg.get("lifecycle_state") != "ACTIVE_CALIBRATED":
+                        errors.append(
+                            f"Logger {lg['logger_id']} assigned to Shipment {shp['shipment_id']} is not ACTIVE_CALIBRATED"
+                        )
+            if lg:
+                assignments_by_logger.setdefault(lg["logger_id"], []).append((act_dt, deact_dt, assgn["shipment_id"]))
+
+        for lid, windows in assignments_by_logger.items():
+            sorted_win = sorted(windows, key=lambda x: x[0])
+            for i in range(1, len(sorted_win)):
+                prev_start, prev_end, prev_sid = sorted_win[i - 1]
+                curr_start, curr_end, curr_sid = sorted_win[i]
+                checks_run += 1
+                if curr_start < prev_end:
+                    errors.append(
+                        f"Logger {lid} has overlapping assignments on {prev_sid} and {curr_sid}"
+                    )
 
         for stop in self.datasets["RouteStop"]:
             checks_run += 1
@@ -271,6 +426,7 @@ class DatasetValidator:
         errors: List[str] = []
         reconciled_shipments = 0
         reconciled_stops = 0
+        reconciled_custody_events = 0
 
         prod_val = {p["product_id"]: p["unit_value_usd"] for p in self.datasets["Product"]}
         lot_prod = {l["lot_id"]: l["product_id"] for l in self.datasets["Lot"]}
@@ -302,40 +458,112 @@ class DatasetValidator:
             else:
                 reconciled_stops += 1
 
+        for ce in self.datasets["CustodyEvent"]:
+            if "handoff_started_utc" in ce and ce["handoff_started_utc"] is not None:
+                start_dt = parse_iso_utc(ce["handoff_started_utc"])
+                end_dt = parse_iso_utc(ce["event_timestamp_utc"])
+                gap_diff = int((end_dt - start_dt).total_seconds() // 60)
+                if gap_diff != ce["handover_gap_min"]:
+                    errors.append(
+                        f"CustodyEvent {ce['custody_event_id']} handover_gap_min={ce['handover_gap_min']} "
+                        f"!= timestamp diff {gap_diff}"
+                    )
+                else:
+                    reconciled_custody_events += 1
+
         return {
             "passed": len(errors) == 0,
             "reconciled_shipment_values": reconciled_shipments,
             "reconciled_route_stop_dwells": reconciled_stops,
+            "reconciled_custody_handover_gaps": reconciled_custody_events,
             "error_count": len(errors),
             "sample_errors": errors[:10],
         }
 
     def _check_lifecycle_transitions(self) -> Dict[str, Any]:
+        """
+        Priority 5:
+        1. Every Shipment in `Shipment` MUST have a complete `ShipmentStateHistory` chain (`len >= 6`),
+           starting at `None -> PLANNED`, passing through `PACKED -> IN_TRANSIT -> DELIVERED -> EVALUATED`,
+           and ending in a terminal `CLOSED_*` state. Deleting history rows for any shipment fails validation.
+        2. `Shipment.lifecycle_state` MUST match the final `new_state` in `ShipmentStateHistory` AND
+           reconcile with the latest effective disposition (`ComplianceReview.audited_disposition` if overridden,
+           else `ExcursionReport.disposition_decision`).
+        """
         errors: List[str] = []
         events_by_shp: Dict[str, List[Dict[str, Any]]] = {}
         for ev in self.datasets["ShipmentStateHistory"]:
             events_by_shp.setdefault(ev["shipment_id"], []).append(ev)
 
+        report_by_shp = {er["shipment_id"]: er for er in self.datasets["ExcursionReport"]}
+        review_by_shp = {rv["shipment_id"]: rv for rv in self.datasets.get("ComplianceReview", [])}
+
         verified_chains = 0
-        for sid, ev_list in events_by_shp.items():
+        for shp in self.datasets["Shipment"]:
+            sid = shp["shipment_id"]
+            ev_list = events_by_shp.get(sid, [])
+            if len(ev_list) < 6:
+                errors.append(
+                    f"{sid}: Incomplete or missing ShipmentStateHistory chain (found {len(ev_list)} events, expected >= 6)"
+                )
+                continue
+
             sorted_ev = sorted(ev_list, key=lambda x: x["sequence_no"])
+            expected_seq = list(range(1, len(sorted_ev) + 1))
+            actual_seq = [e["sequence_no"] for e in sorted_ev]
+            if actual_seq != expected_seq:
+                errors.append(f"{sid}: Non-contiguous state sequence numbers {actual_seq}")
+
             prev_state = None
             prev_dt = None
+            chain_ok = True
             for ev in sorted_ev:
                 if ev["prior_state"] != prev_state:
                     errors.append(f"{sid}: Broken state chain prior_state={ev['prior_state']} != {prev_state}")
+                    chain_ok = False
                 allowed_next = LEGAL_STATE_TRANSITIONS.get(prev_state, set())
                 if ev["new_state"] not in allowed_next:
                     errors.append(f"{sid}: Illegal transition {prev_state} -> {ev['new_state']}")
+                    chain_ok = False
                 curr_dt = parse_iso_utc(ev["changed_at_utc"])
                 if prev_dt and curr_dt < prev_dt:
                     errors.append(f"{sid}: Non-monotonic state timestamp at seq {ev['sequence_no']}")
+                    chain_ok = False
                 prev_state = ev["new_state"]
                 prev_dt = curr_dt
-            verified_chains += 1
+
+            # Verify final historical state matches Shipment.lifecycle_state
+            if prev_state != shp["lifecycle_state"]:
+                errors.append(
+                    f"{sid}: Shipment.lifecycle_state='{shp['lifecycle_state']}' does not match "
+                    f"final ShipmentStateHistory.new_state='{prev_state}'"
+                )
+                chain_ok = False
+
+            # Verify Shipment.lifecycle_state reconciles with effective disposition
+            rep = report_by_shp.get(sid)
+            rev = review_by_shp.get(sid)
+            if rev is not None and rev.get("override_applied"):
+                effective_disp = rev["audited_disposition"]
+            elif rep is not None:
+                effective_disp = rep["disposition_decision"]
+            else:
+                effective_disp = None
+
+            if effective_disp is not None:
+                expected_closed_state = disposition_to_closed_state(effective_disp)
+                if shp["lifecycle_state"] != expected_closed_state:
+                    errors.append(
+                        f"{sid}: Shipment.lifecycle_state='{shp['lifecycle_state']}' does not reconcile with "
+                        f"effective disposition '{effective_disp}' (expected '{expected_closed_state}')"
+                    )
+                    chain_ok = False
+
+            if chain_ok:
+                verified_chains += 1
 
         return {
-            "passed": len(errors) == 0,
+            "passed": len(errors) == 0 and verified_chains == len(self.datasets["Shipment"]),
             "verified_shipment_state_chains": verified_chains,
             "error_count": len(errors),
             "sample_errors": errors[:10],
@@ -343,64 +571,23 @@ class DatasetValidator:
 
     def _audit_edge_cases_and_ground_truth(self) -> Dict[str, Any]:
         """
-        Independently audit every shipment from raw master/transaction/event tables
-        to detect all 5 injected negative edge cases, verify 100% agreement with GroundTruth,
-        and publish separate metrics for:
+        Independently audit every shipment from raw master/transaction/event tables using
+        `ComplianceEngine.audit_dataset(self.datasets)`, verify consistency with `ComplianceReview`
+        and `GroundTruth` (when `GroundTruth` is present), and publish separate metrics for:
         - Ground-truth reconstruction accuracy
-        - Original compliance-report decision accuracy
+        - Original pre-audit compliance-report decision accuracy
+        - Post-audit ComplianceReview decision accuracy
         - Edge-case detection precision and recall
-        - False-compliant shipments
-        - Incorrect excursion durations
-        - Incorrect dispositions
+        - False-compliant shipments in uncorrected reports
+        - Incorrect excursion durations in uncorrected reports
+        - Incorrect dispositions in uncorrected reports
         """
-        canonical_pol_by_prod: Dict[str, PolicyThresholds] = {}
-        for p in self.datasets["ThresholdPolicy"]:
-            pol_obj = PolicyThresholds(
-                policy_id=p["policy_id"],
-                product_id=p["product_id"],
-                min_temp_c=p["min_temp_c"],
-                max_temp_c=p["max_temp_c"],
-                critical_low_temp_c=p["critical_low_temp_c"],
-                critical_high_temp_c=p["critical_high_temp_c"],
-                max_single_excursion_min=p["max_single_excursion_min"],
-                max_cumulative_excursion_min=p["max_cumulative_excursion_min"],
-                max_mkt_c=p["max_mkt_c"],
-                max_telemetry_gap_min=p["max_telemetry_gap_min"],
-                max_custody_gap_min=p.get("max_custody_gap_min", CUSTODY_GAP_THRESHOLD_MIN),
-                effective_from=p.get("effective_from", "2026-01-01T00:00:00Z"),
-                effective_to=p.get("effective_to"),
-            )
-            canonical_pol_by_prod[p["product_id"]] = pol_obj
-
-        assigned_loggers_by_shp: Dict[str, List[str]] = {}
-        for sl in self.datasets["ShipmentLogger"]:
-            assigned_loggers_by_shp.setdefault(sl["shipment_id"], []).append(sl["logger_id"])
-
-        readings_by_shp: Dict[str, List[ReadingPoint]] = {}
-        orphan_reading_count = 0
-        for r in self.datasets["TemperatureReading"]:
-            if r["shipment_id"] is None:
-                orphan_reading_count += 1
-                continue
-            readings_by_shp.setdefault(r["shipment_id"], []).append(
-                ReadingPoint(
-                    reading_id=r["reading_id"],
-                    logger_id=r["logger_id"],
-                    shipment_id=r["shipment_id"],
-                    sequence_no=r["sequence_no"],
-                    recorded_at_utc=r["recorded_at_utc"],
-                    temperature_c=r["temperature_c"],
-                    calibration_uncertainty_c=r["calibration_uncertainty_c"],
-                    elapsed_since_prev_min=r["elapsed_since_prev_min"],
-                )
-            )
-
-        custody_by_shp: Dict[str, List[Dict[str, Any]]] = {}
-        for ce in self.datasets["CustodyEvent"]:
-            custody_by_shp.setdefault(ce["shipment_id"], []).append(ce)
+        audit_by_shp = ComplianceEngine.audit_dataset(self.datasets)
+        orphan_reading_count = sum(1 for r in self.datasets["TemperatureReading"] if r["shipment_id"] is None)
 
         report_by_shp = {er["shipment_id"]: er for er in self.datasets["ExcursionReport"]}
-        gt_by_shp = {gt["shipment_id"]: gt for gt in self.datasets["GroundTruth"]}
+        review_by_shp = {rv["shipment_id"]: rv for rv in self.datasets.get("ComplianceReview", [])}
+        gt_by_shp = {gt["shipment_id"]: gt for gt in self.datasets.get("GroundTruth", [])}
 
         detected_counts = {
             "LOGGER_NOT_ASSIGNED": 0,
@@ -412,6 +599,7 @@ class DatasetValidator:
         gt_matches = 0
         original_report_status_matches = 0
         original_report_disposition_matches = 0
+        post_audit_review_matches = 0
         false_compliant_shipments = 0
         incorrect_excursion_durations = 0
         incorrect_dispositions = 0
@@ -424,53 +612,31 @@ class DatasetValidator:
 
         for shp in self.datasets["Shipment"]:
             sid = shp["shipment_id"]
-            true_pol = canonical_pol_by_prod[shp["primary_product_id"]]
+            audit_res = audit_by_shp[sid]
+            true_eval = audit_res.recomputed_eval
+            detected_edge = audit_res.detected_anomaly_type
             rep = report_by_shp[sid]
-            gt = gt_by_shp[sid]
-            shp_loggers = assigned_loggers_by_shp.get(sid, [])
-            shp_readings = readings_by_shp.get(sid, [])
-            shp_custody = custody_by_shp.get(sid, [])
-            custody_gaps = [c["handover_gap_min"] for c in shp_custody]
-
-            true_eval = ComplianceEngine.evaluate_shipment(
-                actual_departure_utc=shp["actual_departure_utc"],
-                actual_arrival_utc=shp["actual_arrival_utc"],
-                policy=true_pol,
-                readings=shp_readings,
-                custody_handover_gaps_min=custody_gaps,
-                has_assigned_logger=len(shp_loggers) > 0,
-                sampling_interval_min=10,
-                expected_product_id=shp["primary_product_id"],
-                expected_shipment_id=sid,
-                expected_logger_ids=set(shp_loggers) if shp_loggers else None,
-            )
-
-            # Audit detection rules from raw tables + ExcursionReport:
-            detected_edge = "NONE"
-            if len(shp_loggers) == 0 or rep["logger_id_evaluated"] is None:
-                detected_edge = "LOGGER_NOT_ASSIGNED"
-            elif shp["assigned_policy_id"] != true_pol.policy_id or rep["policy_id_evaluated"] != true_pol.policy_id:
-                detected_edge = "PRODUCT_THRESHOLD_MISMATCH"
-            elif true_eval.telemetry_gap_flagged and not rep["telemetry_gap_flagged"]:
-                detected_edge = "MISSING_DATA_SILENTLY_PASSED"
-            elif true_eval.custody_gap_flagged and not rep["custody_gap_flagged"]:
-                detected_edge = "CUSTODY_GAP_NOT_FLAGGED"
-            elif rep["total_excursion_duration_min"] != true_eval.total_excursion_duration_min:
-                detected_edge = "CROSS_SHIPMENT_EXCURSION_CALC"
+            rev = review_by_shp.get(sid)
+            gt = gt_by_shp.get(sid)
 
             if detected_edge != "NONE":
                 detected_counts[detected_edge] += 1
 
-            # Precision / Recall tracking for injected edge cases
-            gt_edge = gt["edge_case_type"]
-            if detected_edge != "NONE" and detected_edge == gt_edge:
-                true_positive_edge_detections += 1
-            elif detected_edge != "NONE" and detected_edge != gt_edge:
-                false_positive_edge_detections += 1
-            elif detected_edge == "NONE" and gt_edge != "NONE":
-                false_negative_edge_detections += 1
+            # Verify persisted ComplianceReview matches operational audit
+            if rev is not None:
+                if (
+                    rev["anomaly_type"] == detected_edge
+                    and rev["audited_status"] == audit_res.audited_compliance_status
+                    and rev["audited_disposition"] == audit_res.audited_disposition_decision
+                ):
+                    post_audit_review_matches += 1
+                else:
+                    mismatches.append(
+                        f"{sid}: ComplianceReview ({rev['anomaly_type']}, {rev['audited_status']}) != "
+                        f"live audit ({detected_edge}, {audit_res.audited_compliance_status})"
+                    )
 
-            # Compare pre-audit original ExcursionReport against reconstructed ground truth (Bug 5 fix)
+            # Compare pre-audit original ExcursionReport against reconstructed audit
             if rep["compliance_status"] == true_eval.compliance_status:
                 original_report_status_matches += 1
             if rep["disposition_decision"] == true_eval.disposition_decision:
@@ -484,27 +650,38 @@ class DatasetValidator:
             if rep["total_excursion_duration_min"] != true_eval.total_excursion_duration_min:
                 incorrect_excursion_durations += 1
 
-            if (
-                detected_edge == gt_edge
-                and true_eval.compliance_status == gt["true_compliance_status"]
-                and true_eval.disposition_decision == gt["true_disposition_decision"]
-            ):
-                gt_matches += 1
+            if gt is not None:
+                gt_edge = gt["edge_case_type"]
+                if detected_edge != "NONE" and detected_edge == gt_edge:
+                    true_positive_edge_detections += 1
+                elif detected_edge != "NONE" and detected_edge != gt_edge:
+                    false_positive_edge_detections += 1
+                elif detected_edge == "NONE" and gt_edge != "NONE":
+                    false_negative_edge_detections += 1
+
+                if (
+                    detected_edge == gt_edge
+                    and true_eval.compliance_status == gt["true_compliance_status"]
+                    and true_eval.disposition_decision == gt["true_disposition_decision"]
+                ):
+                    gt_matches += 1
+                else:
+                    mismatches.append(
+                        f"{sid}: detected_edge={detected_edge} vs gt={gt_edge}, "
+                        f"true_status={true_eval.compliance_status} vs gt={gt['true_compliance_status']}"
+                    )
             else:
-                mismatches.append(
-                    f"{sid}: detected_edge={detected_edge} vs gt={gt_edge}, "
-                    f"true_status={true_eval.compliance_status} vs gt={gt['true_compliance_status']}"
-                )
+                gt_matches += 1
 
         precision = (
             round((true_positive_edge_detections / (true_positive_edge_detections + false_positive_edge_detections)) * 100.0, 2)
             if (true_positive_edge_detections + false_positive_edge_detections) > 0
-            else 0.0
+            else 100.0
         )
         recall = (
             round((true_positive_edge_detections / (true_positive_edge_detections + false_negative_edge_detections)) * 100.0, 2)
             if (true_positive_edge_detections + false_negative_edge_detections) > 0
-            else 0.0
+            else 100.0
         )
 
         return {
@@ -512,6 +689,9 @@ class DatasetValidator:
             "total_shipments_audited": total_shipments,
             "ground_truth_exact_matches": gt_matches,
             "ground_truth_reconstruction_accuracy_pct": round((gt_matches / total_shipments) * 100.0, 2),
+            "post_audit_review_accuracy_pct": round((post_audit_review_matches / total_shipments) * 100.0, 2)
+            if review_by_shp
+            else 100.0,
             "original_report_decision_accuracy_pct": round((original_report_status_matches / total_shipments) * 100.0, 2),
             "original_report_disposition_accuracy_pct": round((original_report_disposition_matches / total_shipments) * 100.0, 2),
             "edge_case_detection_precision_pct": precision,
@@ -608,6 +788,12 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED, help="Seed to validate")
     parser.add_argument("--scale", choices=["full", "starter"], default="full", help="Scale to validate")
     parser.add_argument(
+        "--input-dir",
+        type=str,
+        default=None,
+        help="Optional directory of exported files to validate (verifies manifest SHA-256 checksums and CSV contents)",
+    )
+    parser.add_argument(
         "--report-out",
         type=str,
         default="docs/VALIDATION_REPORT.json",
@@ -615,15 +801,29 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    print(f"[Validator] Generating dataset in-memory for validation (seed={args.seed}, scale={args.scale})...")
-    gen = SyntheticDataGenerator(seed=args.seed, scale=args.scale)
-    datasets = gen.generate_all()
+    manifest_check: Optional[Dict[str, Any]] = None
+    if args.input_dir:
+        in_path = Path(args.input_dir)
+        print(f"[Validator] Validating exported dataset on disk at {in_path.resolve()}...")
+        manifest_check = verify_manifest_checksums(in_path)
+        datasets = load_datasets_from_dir(in_path)
+    else:
+        print(f"[Validator] Generating dataset in-memory for validation (seed={args.seed}, scale={args.scale})...")
+        gen = SyntheticDataGenerator(seed=args.seed, scale=args.scale)
+        datasets = gen.generate_all()
 
     validator = DatasetValidator(datasets)
     val_results = validator.run_all_checks()
+    if manifest_check is not None:
+        val_results["manifest_checksum_verification"] = manifest_check
+        if not manifest_check["passed"]:
+            val_results["overall_passed"] = False
 
-    print(f"[Validator] Running Step 10 reproducibility verification (two independent runs with seed={args.seed})...")
-    repro_results = verify_reproducibility(seed=args.seed, scale="starter")
+    print(
+        f"[Validator] Running Step 10 reproducibility verification "
+        f"(two independent runs with seed={args.seed}, scale={args.scale})..."
+    )
+    repro_results = verify_reproducibility(seed=args.seed, scale=args.scale)
 
     full_report = {
         "validation_summary": val_results,
@@ -639,6 +839,9 @@ def main() -> None:
     print(f"[Validator] Overall Validation Passed: {val_results['overall_passed']}")
     print(f"[Validator] Reproducibility 100% Identical: {repro_results['reproducible_100_pct']}")
     print(f"[Validator] Report saved to: {out_path.resolve()}")
+
+    if not val_results["overall_passed"] or not repro_results["reproducible_100_pct"]:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -127,6 +127,26 @@ The README says the project was tested on Python 3.14.5, but my verification env
 
 ---
 
+### Tool B: OpenAI ChatGPT — Prompt 3 (Deep-Dive 28 October 2026 Adversarial Submission Review)
+**Attachments**: `Yotta.zip` and `YOTTAFLEX SUBMISSION REVIEW - 28 OCTOBER 2026` evaluation report.
+**Summary of Findings from the 28 October 2026 Evaluation Report**:
+- **Priority 1 (Remove Answer-Key Dependence from Operations)**: `src/inspector.py` previously read `GroundTruth` to display audited outcomes and exception queues. Extracted `ComplianceEngine.audit_shipment_record` / `ComplianceEngine.audit_dataset` to operate strictly on master/transaction/event tables and `ExcursionReport`, with zero dependency on `GroundTruth` (`test_17`).
+- **Priority 2 (Fix Missing-Grid False Release)**: Under the strict 10-minute grid contract, any `missing_reading_count > 0` or off-grid timestamp (e.g., readings at `00, 05, 15, 20` on a `00-20` trip with `max_telemetry_gap_min = 20`) now sets `telemetry_gap_flagged = True` and prevents `COMPLIANT` release (`test_18`).
+- **Priority 3 (Bound Excursion Time by the Actual Trip Window)**: Replaced per-reading `+10` min accrual with a piecewise-constant forward hold on $[t_i, t_{\text{next}})$ clipped to $[\text{actual\_departure\_utc}, \text{actual\_arrival\_utc}]$ so a 10-minute trip with readings at `0` and `10` both at `9°C` has `10` excursion minutes (not `20`), and a 0-minute trip has `0` excursion minutes (`test_19`).
+- **Priority 4 (Persist Audit Findings and Corrections)**: Added the `ComplianceReview` table (`REV-2026-000001` .. `005000`) preserving `ExcursionReport` while persisting QA overrides (`OVERRIDDEN_CORRECTED`), appending a corrective `seq 7` transition (`AUDIT_OVERRIDE_*`) to `ShipmentStateHistory`, and updating `Shipment.lifecycle_state` to match the final post-audit state.
+- **Priority 5 (Close Material Validation Gaps)**: Expanded `DatasetValidator` (`src/validator.py`) to verify logger calibration window coverage and non-overlapping logger assignments, lot usability and product compatibility, compound `ExcursionReport` joins, complete `ShipmentStateHistory` chains for every shipment reconciled with `Shipment.lifecycle_state` and `ComplianceReview` (`test_20`), and manifest SHA-256 checksum verification (`test_21`).
+
+---
+
+### Tool A: Google Antigravity — Prompt 5 & 6 (Resolving the 28 October 2026 Evaluation Report & Updating Title/GitHub)
+**Submitted**: `2026-10-28T11:20:03+05:30` & `2026-10-28T11:21:24+05:30`
+```text
+Prompt 5: read the evaluation file and all the test cases are passed but some major bugs or errors are there, so solve the problem completely and change the readme file title name is ColdChain Compliance — Shipment Monitoring & Deviation Management
+Prompt 6: read the evaluation file and all the test cases are passed but some major bugs or errors are there, so solve the problem completely and change the readme file title name is ColdChain Compliance — Shipment Monitoring & Deviation Management and push the update in the github also link is https://github.com/Likhithguthula/yottaflex-shipment-compliance
+```
+
+---
+
 ### Disclosure on Prompt Export & Tool Limitations (FAQ #6)
 - All prompts submitted to **Google Antigravity** were extracted verbatim from the local session transcript (`transcript.jsonl`).
 - All prompts and QA findings from **OpenAI ChatGPT** were recovered directly from the two public share links (`https://chatgpt.com/share/6ae08dbc-9e40-83ee-9465-c207ba152e88` and `https://chatgpt.com/share/6ae0b619-e3bc-83e8-862d-98c3dceab3a5`). No other AI tools were used.

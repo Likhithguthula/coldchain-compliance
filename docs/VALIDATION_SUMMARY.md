@@ -4,7 +4,7 @@
 - **Full Dataset Scale**: `5,000` Shipments, `1,000` Loggers, `10-minute` Telemetry Interval
 - **Starter Dataset Scale**: `250` Shipments, `100` Loggers, `10-minute` Telemetry Interval
 - **Overall Structural & Referential Validation**: `PASSED (100%)`
-- **Two-Run Deterministic Reproducibility (Step 10)**: `PASSED (100% SHA-256 Match)`
+- **Two-Run Deterministic Reproducibility (Step 10)**: `PASSED (100% SHA-256 Match across 31 manifest-listed files)`
 
 ---
 
@@ -24,7 +24,8 @@
 | `CustodyEvent` | `15,000` | `750` | `CUST-2026-0000001` |
 | `TemperatureReading` | `93,395` | `4,666` | `TEMP-LOG-SHP-2026-000001-01-20260102060000` |
 | `ExcursionReport` | `5,000` | `250` | `EXCR-2026-000001` |
-| `ShipmentStateHistory` | `30,000` | `1,500` | `STHIST-2026-0000001` |
+| `ComplianceReview` | `5,000` | `250` | `REV-2026-000001` |
+| `ShipmentStateHistory` | `30,200` | `1,509` | `STHIST-2026-0000001` |
 | `GroundTruth` | `5,000` | `250` | `SHP-2026-000001` (Separate File) |
 
 ---
@@ -33,13 +34,13 @@
 
 | Validation Check Category | Status | Verified Metric / Coverage | Error Count |
 | :--- | :--- | :--- | ---: |
-| Primary Key Uniqueness & Nomenclature | `PASS` | All 13 entity/event tables verified against regex rules | `0` |
-| Foreign Key Referential Integrity | `PASS` | `314,700` foreign-key links verified | `0` |
-| Allowed Enumerations | `PASS` | `20,020` enum fields verified | `0` |
-| Chronological Date & Timestamp Ordering | `PASS` | `26,400` date/time intervals verified | `0` |
-| Arithmetic Reconciliation | `PASS` | `5,000` shipments & `15,000` stops reconciled | `0` |
-| Lifecycle State Transition History | `PASS` | `5,000` immutable state chains verified | `0` |
-| Independent Anomaly & Edge-Case Audit | `PASS` | `5,000 / 5,000` exact ground-truth matches | `0` |
+| Primary Key Uniqueness & Nomenclature | `PASS` | All 14 entity/event/review tables verified against regex rules | `0` |
+| Foreign Key & Compound Join Integrity | `PASS` | `329,900` foreign-key & compound links verified | `0` |
+| Allowed Enumerations | `PASS` | `30,020` enum fields verified | `0` |
+| Chronological Date, Calibration & Lot Window Ordering | `PASS` | `46,260` date/time, calibration & non-overlap checks verified | `0` |
+| Arithmetic Reconciliation | `PASS` | `5,000` shipments, `15,000` stops & `15,000` custody handoffs reconciled | `0` |
+| Complete Lifecycle State Transition History | `PASS` | `5,000` complete state chains reconciled with final `Shipment.lifecycle_state` | `0` |
+| Independent Operational Anomaly & Edge-Case Audit | `PASS` | `5,000 / 5,000` exact matches (`100.0%` post-audit review accuracy) | `0` |
 
 ---
 
@@ -74,7 +75,8 @@
 | Evaluation Metric | Measured Value | Interpretation |
 | :--- | ---: | :--- |
 | **Ground-Truth Reconstruction Accuracy** | `100.00%` (`5,000 / 5,000`) | Independent audit engine reconstructs 100% of true statuses & dispositions from source records |
-| **Original Pre-Audit Report Decision Accuracy** | `96.00%` | Reflects the intentionally injected negative process defects in `ExcursionReport` before audit correction |
+| **Post-Audit `ComplianceReview` Accuracy** | `100.00%` | Persisted `ComplianceReview` records and corrected `Shipment.lifecycle_state` match 100% of audited outcomes |
+| **Original Pre-Audit Report Decision Accuracy** | `96.40%` | Reflects the intentionally injected negative process defects in `ExcursionReport` before audit correction |
 | **Original Pre-Audit Disposition Accuracy** | `96.00%` | Reflects dispositions prior to independent audit override |
 | **Edge-Case Detection Precision** | `100.00%` | Zero false-positive anomaly accusations on normal/operational shipments |
 | **Edge-Case Detection Recall** | `100.00%` | 100% of injected negative edge cases (`250 / 250`) caught by independent auditor |
@@ -84,14 +86,14 @@
 
 ---
 
-## 4. Compliance Status Distribution (Ground Truth vs. Reported)
+## 4. Compliance Status Distribution (Post-Audit Ground Truth vs. Pre-Audit ExcursionReport)
 
-| Compliance Status | Ground Truth Count | Reported Count (Before Audit Correction) |
+| Compliance Status | Audited / Ground-Truth Count (`ComplianceReview`) | Pre-Audit `ExcursionReport` Count (Before Override) |
 | :--- | ---: | ---: |
-| `COMPLIANT` | `3,800` | `3,850` |
-| `CRITICAL_EXCURSION` | `400` | `500` |
+| `COMPLIANT` | `3,780` | `3,850` |
+| `CRITICAL_EXCURSION` | `360` | `440` |
 | `INVESTIGATION_REQUIRED` | `150` | `150` |
-| `MINOR_EXCURSION_ACCEPTABLE` | `350` | `300` |
+| `MINOR_EXCURSION_ACCEPTABLE` | `410` | `360` |
 | `NON_COMPLIANT_CUSTODY_GAP` | `50` | `0` |
 | `NON_COMPLIANT_MISSING_DATA` | `250` | `200` |
 
@@ -101,32 +103,34 @@
 
 | Exported File | Row Count (Run 1) | Row Count (Run 2) | SHA-256 Checksum (Run 1 & Run 2) | Match |
 | :--- | ---: | ---: | :--- | :--- |
-| `csv/CustodyEvent.csv` | `750` | `750` | `77c206d5bf4336bdf4af31f1...` | `IDENTICAL` |
-| `csv/ExcursionReport.csv` | `250` | `250` | `cad94a248b125bd8e6172bb4...` | `IDENTICAL` |
+| `csv/ComplianceReview.csv` | `250` | `250` | `0debcc6bb9ad5c3974099555...` | `IDENTICAL` |
+| `csv/CustodyEvent.csv` | `750` | `750` | `20bf3c160091e7ce2705371a...` | `IDENTICAL` |
+| `csv/ExcursionReport.csv` | `250` | `250` | `9d15e0a72c72252cd262e859...` | `IDENTICAL` |
 | `csv/Logger.csv` | `100` | `100` | `6dce2bc5d610c19215c3599d...` | `IDENTICAL` |
 | `csv/Lot.csv` | `50` | `50` | `3ae3382e9956f932b9bbe194...` | `IDENTICAL` |
 | `csv/Packaging.csv` | `10` | `10` | `468332636491190a02790020...` | `IDENTICAL` |
 | `csv/Product.csv` | `10` | `10` | `9cfb034c5dc479fbefebbf2b...` | `IDENTICAL` |
 | `csv/RouteStop.csv` | `750` | `750` | `23a952c8c9dcd575767325f8...` | `IDENTICAL` |
-| `csv/Shipment.csv` | `250` | `250` | `6d69b15e1aa4eb60544341a6...` | `IDENTICAL` |
+| `csv/Shipment.csv` | `250` | `250` | `04d0a93f83f3eeb44a606442...` | `IDENTICAL` |
 | `csv/ShipmentLogger.csv` | `247` | `247` | `029f0b57422c7767e3b1c844...` | `IDENTICAL` |
-| `csv/ShipmentLot.csv` | `300` | `300` | `9ff23e525a0ce2ede651273c...` | `IDENTICAL` |
-| `csv/ShipmentStateHistory.csv` | `1,500` | `1,500` | `029cc41b652a1773b7240568...` | `IDENTICAL` |
-| `csv/TemperatureReading.csv` | `4,666` | `4,666` | `a0247ad20577de044bfc6d90...` | `IDENTICAL` |
+| `csv/ShipmentLot.csv` | `300` | `300` | `990a3e98c293fc0ba18719d1...` | `IDENTICAL` |
+| `csv/ShipmentStateHistory.csv` | `1,509` | `1,509` | `fab005a1ea4f9419aca89322...` | `IDENTICAL` |
+| `csv/TemperatureReading.csv` | `4,666` | `4,666` | `2352137d4938aac451fe1acf...` | `IDENTICAL` |
 | `csv/ThresholdPolicy.csv` | `10` | `10` | `4fd433bc309a10ee12acce0f...` | `IDENTICAL` |
-| `ground_truth/ground_truth.csv` | `250` | `250` | `359d944c25421f3385c16de1...` | `IDENTICAL` |
-| `ground_truth/ground_truth.json` | `250` | `250` | `9191f546898f5f41401cacd0...` | `IDENTICAL` |
-| `json/CustodyEvent.json` | `750` | `750` | `a9e8a92ddf20d1c388101b8a...` | `IDENTICAL` |
-| `json/ExcursionReport.json` | `250` | `250` | `c7ec5d6c2f402de09af49a06...` | `IDENTICAL` |
+| `ground_truth/ground_truth.csv` | `250` | `250` | `8c7c7c60bf963f74db84c3e8...` | `IDENTICAL` |
+| `ground_truth/ground_truth.json` | `250` | `250` | `fb980eef24ba318f616fbeff...` | `IDENTICAL` |
+| `json/ComplianceReview.json` | `250` | `250` | `2ec59d9a3352f950284898b4...` | `IDENTICAL` |
+| `json/CustodyEvent.json` | `750` | `750` | `59e9658eb7981307843d4327...` | `IDENTICAL` |
+| `json/ExcursionReport.json` | `250` | `250` | `9f613b7ee514c0cafeeabe82...` | `IDENTICAL` |
 | `json/Logger.json` | `100` | `100` | `0a59c8f5c832ba77c456c068...` | `IDENTICAL` |
 | `json/Lot.json` | `50` | `50` | `b46ce9a962e206c946989110...` | `IDENTICAL` |
 | `json/Packaging.json` | `10` | `10` | `a37314fee417ca21fba0ddd9...` | `IDENTICAL` |
 | `json/Product.json` | `10` | `10` | `a9fd7414adfd8a35a0d2bc9f...` | `IDENTICAL` |
 | `json/RouteStop.json` | `750` | `750` | `1b32c3948a79c59c25b643fd...` | `IDENTICAL` |
-| `json/Shipment.json` | `250` | `250` | `c19925c327f97e75d1e048c9...` | `IDENTICAL` |
+| `json/Shipment.json` | `250` | `250` | `171d8549e622e8cad396c6fa...` | `IDENTICAL` |
 | `json/ShipmentLogger.json` | `247` | `247` | `1a69358c9f3120a9fc48caa0...` | `IDENTICAL` |
-| `json/ShipmentLot.json` | `300` | `300` | `3bf4074bc2daa9d2133735a9...` | `IDENTICAL` |
-| `json/ShipmentStateHistory.json` | `1,500` | `1,500` | `d738cec234597730bbfb1f36...` | `IDENTICAL` |
-| `json/TemperatureReading.json` | `4,666` | `4,666` | `553eeb1f6e8c14260e908163...` | `IDENTICAL` |
+| `json/ShipmentLot.json` | `300` | `300` | `51bb5f17146ee1b741a417e7...` | `IDENTICAL` |
+| `json/ShipmentStateHistory.json` | `1,509` | `1,509` | `c25617b7a852df29338fb7f7...` | `IDENTICAL` |
+| `json/TemperatureReading.json` | `4,666` | `4,666` | `a79fe45247834506c8007a12...` | `IDENTICAL` |
 | `json/ThresholdPolicy.json` | `10` | `10` | `343d1b8da9c4f91d7ff07450...` | `IDENTICAL` |
-| `sql/seed_data.sql` | `8,893` | `8,893` | `850dea532dbb087c636658e0...` | `IDENTICAL` |
+| `sql/seed_data.sql` | `9,152` | `9,152` | `7bdf385b5076da8f900ea047...` | `IDENTICAL` |

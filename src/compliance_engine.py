@@ -3,13 +3,16 @@ Core Cold-Chain Compliance & Deviation Evaluation Engine.
 
 Provides deterministic, traceable rules for:
 1. Mean Kinetic Temperature (MKT) calculation via the Haynes / USP <1079> equation.
-2. Excursion duration calculation across regular and irregular sampling intervals.
-3. Telemetry missing-data gap detection on an explicit expected time grid, plus duplicate
-   timestamp / reading ID detection and out-of-window filtering.
+2. Bounded excursion duration calculation using piecewise-constant hold on [t_i, t_{i+1})
+   strictly clipped to the shipment window [actual_departure_utc, actual_arrival_utc], so
+   excursion duration can never exceed total trip duration.
+3. Strict expected 10-minute time-grid verification, off-grid timestamp detection,
+   duplicate timestamp / reading_id detection, and non-finite (NaN/Inf) telemetry rejection.
 4. Product-to-Policy compatibility and effective-date window verification.
 5. Configurable custody handoff delay / gap verification.
 6. Calibration uncertainty borderline and excursion-across-gap uncertainty detection.
-7. Final compliance status and disposition decision assignment.
+7. Independent Operational QA Audit (`audit_shipment` / `audit_dataset`) operating purely
+   on master/transaction/event records without reading GroundTruth labels.
 """
 
 from __future__ import annotations
@@ -17,7 +20,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 
 # Constants for Haynes Mean Kinetic Temperature (MKT) formula (USP <1079>)
@@ -42,6 +45,7 @@ class PolicyThresholds:
     max_custody_gap_min: int = CUSTODY_GAP_THRESHOLD_MIN
     effective_from: str = "2026-01-01T00:00:00Z"
     effective_to: Optional[str] = None
+    version: int = 1
 
 
 @dataclass(frozen=True)
@@ -76,6 +80,24 @@ class EvaluationResult:
     evaluated_by_actor: str
 
 
+@dataclass(frozen=True)
+class OperationalAuditResult:
+    shipment_id: str
+    report_id: str
+    canonical_policy_id: str
+    assigned_policy_id: str
+    detected_anomaly_type: str
+    has_operational_defect: bool
+    recomputed_eval: EvaluationResult
+    reported_compliance_status: str
+    reported_disposition_decision: str
+    audited_compliance_status: str
+    audited_disposition_decision: str
+    requires_corrective_override: bool
+    evidence_ids: str
+    audit_summary: str
+
+
 def parse_iso_utc(ts_str: str) -> datetime:
     """Parse ISO-8601 UTC timestamp string (YYYY-MM-DDTHH:MM:SSZ)."""
     if not ts_str or not isinstance(ts_str, str):
@@ -95,15 +117,52 @@ def compute_mkt_celsius(temperatures_c: List[float]) -> Optional[float]:
     """
     if not temperatures_c:
         return None
+    for t in temperatures_c:
+        if not isinstance(t, (int, float)) or not math.isfinite(t) or (t + KELVIN_OFFSET) <= 0:
+            raise ValueError(f"Non-finite or unphysical temperature in MKT calculation: {t!r}")
 
     ratio = DELTA_H_KJ_MOL / GAS_CONSTANT_R  # 10,000 K
-    # Use log-sum-exp trick to avoid floating point underflow/overflow at extreme temperatures
     exponents = [-ratio / (t + KELVIN_OFFSET) for t in temperatures_c]
     max_exp = max(exponents)
     sum_shifted = sum(math.exp(e - max_exp) for e in exponents)
     mean_log = max_exp + math.log(sum_shifted / len(temperatures_c))
     mkt_kelvin = -ratio / mean_log
     return round(mkt_kelvin - KELVIN_OFFSET, 2)
+
+
+def select_effective_policy_for_product(
+    policies: List[PolicyThresholds],
+    product_id: str,
+    departure_utc: str,
+    arrival_utc: str,
+) -> PolicyThresholds:
+    """
+    Select the canonical ThresholdPolicy for `product_id` whose effective window
+    `[effective_from, effective_to]` covers `[departure_utc, arrival_utc]`.
+    If multiple versions match, select the highest `version`.
+    """
+    dep_dt = parse_iso_utc(departure_utc)
+    arr_dt = parse_iso_utc(arrival_utc)
+    candidates: List[PolicyThresholds] = []
+    fallback: List[PolicyThresholds] = []
+
+    for pol in policies:
+        if pol.product_id != product_id:
+            continue
+        fallback.append(pol)
+        eff_from = parse_iso_utc(pol.effective_from) if pol.effective_from else None
+        eff_to = parse_iso_utc(pol.effective_to) if pol.effective_to else None
+        if eff_from and dep_dt < eff_from:
+            continue
+        if eff_to and arr_dt > eff_to:
+            continue
+        candidates.append(pol)
+
+    if candidates:
+        return sorted(candidates, key=lambda p: p.version, reverse=True)[0]
+    if fallback:
+        return sorted(fallback, key=lambda p: p.version, reverse=True)[0]
+    raise KeyError(f"No ThresholdPolicy found for product_id={product_id!r}")
 
 
 class ComplianceEngine:
@@ -124,13 +183,21 @@ class ComplianceEngine:
     ) -> EvaluationResult:
         """
         Evaluate a shipment's temperature telemetry and custody chain against its policy.
-        Every derived value is computed strictly from the source records, enforcing:
-        - Product-to-policy identity and effective-window compatibility (Bug 4 fix)
-        - Cross-shipment / unassigned logger reading rejection (QA-09 fix)
-        - Duplicate timestamp / duplicate reading_id detection & expected grid coverage (Bug 2 fix)
-        - Missing-data gap detection and evidence sufficiency enforcement (Bug 1 fix)
-        - Timestamp-based excursion duration & gap-uncertainty flagging (Bug 3 fix)
+
+        Interval & Excursion Duration Convention (Priority 3 Fix):
+        - Each reading at timestamp `t_i` holds piecewise-constant over `[t_i, t_next)`,
+          where `t_next = min(arr_dt, t_{i+1})` for `i < N-1` and `t_next = arr_dt` for the final reading.
+        - Because disjoint sub-intervals `[t_i, t_next)` partition `[t_0, arr_dt] subset [dep_dt, arr_dt]`,
+          total excursion duration is strictly bounded by `[0, trip_minutes]`.
+        - For a single isolated spike on a regular 10-minute grid (`t_i` breaching, `t_{i+1} = t_i + 10m` normal),
+          the held interval `[t_i, t_{i+1})` is 10 minutes. For a terminal reading at `t_i == arr_dt`,
+          if `t_i` is the only breach at the exact arrival instant (`[arr_dt, arr_dt)`), its held duration
+          is `0` unless the preceding interval was absent; if a zero-duration trip (`dep_dt == arr_dt`) occurs,
+          excursion duration is `0` minutes.
         """
+        if not isinstance(sampling_interval_min, int) or sampling_interval_min <= 0:
+            raise ValueError(f"sampling_interval_min must be a positive integer, got {sampling_interval_min!r}")
+
         dep_dt = parse_iso_utc(actual_departure_utc)
         arr_dt = parse_iso_utc(actual_arrival_utc)
         if arr_dt < dep_dt:
@@ -139,7 +206,7 @@ class ComplianceEngine:
         trip_minutes = max(0, int((arr_dt - dep_dt).total_seconds() // 60))
         expected_count = (trip_minutes // sampling_interval_min) + 1
 
-        # Build the exact expected 10-minute timestamp grid from departure to arrival
+        # Build the exact expected timestamp grid from departure to arrival
         expected_grid_dts: Set[datetime] = {
             dep_dt + timedelta(minutes=i * sampling_interval_min)
             for i in range(expected_count)
@@ -147,7 +214,10 @@ class ComplianceEngine:
 
         # Verify custody handoff gaps against configurable policy threshold
         custody_limit_min = getattr(policy, "max_custody_gap_min", CUSTODY_GAP_THRESHOLD_MIN)
-        max_custody_gap = max(custody_handover_gaps_min) if custody_handover_gaps_min else 0
+        for g in custody_handover_gaps_min:
+            if not isinstance(g, (int, float)) or not math.isfinite(g) or g < 0:
+                raise ValueError(f"Invalid custody handover gap value: {g!r}")
+        max_custody_gap = int(max(custody_handover_gaps_min)) if custody_handover_gaps_min else 0
         custody_gap_flagged = max_custody_gap > custody_limit_min
 
         # Verify Product-to-Policy compatibility and effective window (Bug 4)
@@ -166,22 +236,33 @@ class ComplianceEngine:
             if arr_dt > eff_to_dt:
                 policy_mismatch_detected = True
 
-        # Filter and inspect readings for cross-shipment contamination, outside-window timestamps,
-        # and duplicate reading IDs or duplicate timestamps (Bug 2 & QA-09)
+        # Inspect readings for non-finite values, cross-shipment contamination,
+        # outside-window timestamps, off-grid timestamps, and duplicates
+        invalid_telemetry_detected = False
         duplicate_detected = False
+        off_grid_detected = False
         contamination_or_out_of_window_detected = False
         seen_reading_ids: Set[str] = set()
         seen_timestamps_by_logger: Set[Tuple[str, datetime]] = set()
-        valid_readings_by_dt: dict[datetime, ReadingPoint] = {}
+        valid_readings_by_dt: Dict[datetime, ReadingPoint] = {}
 
         for r in readings:
-            # Check reading_id uniqueness
+            # Reject non-finite (NaN / Inf) temperatures or uncertainties immediately
+            if (
+                not isinstance(r.temperature_c, (int, float))
+                or not math.isfinite(r.temperature_c)
+                or not isinstance(r.calibration_uncertainty_c, (int, float))
+                or not math.isfinite(r.calibration_uncertainty_c)
+                or r.calibration_uncertainty_c < 0
+            ):
+                invalid_telemetry_detected = True
+                continue
+
             if r.reading_id in seen_reading_ids:
                 duplicate_detected = True
                 continue
             seen_reading_ids.add(r.reading_id)
 
-            # Check cross-shipment contamination (QA-09)
             if expected_shipment_id is not None and r.shipment_id != expected_shipment_id:
                 contamination_or_out_of_window_detected = True
                 continue
@@ -194,25 +275,26 @@ class ComplianceEngine:
 
             r_dt = parse_iso_utc(r.recorded_at_utc)
 
-            # Check duplicate timestamp for the same logger (Bug 2)
             key = (r.logger_id, r_dt)
             if key in seen_timestamps_by_logger or r_dt in valid_readings_by_dt:
                 duplicate_detected = True
                 continue
             seen_timestamps_by_logger.add(key)
 
-            # Reject readings outside the shipment window [dep_dt, arr_dt]
             if r_dt < dep_dt or r_dt > arr_dt:
                 contamination_or_out_of_window_detected = True
                 continue
 
+            if r_dt not in expected_grid_dts:
+                off_grid_detected = True
+
             valid_readings_by_dt[r_dt] = r
 
-        # Case 1: No assigned logger or zero valid readings available
-        if not has_assigned_logger or len(valid_readings_by_dt) == 0:
+        # Case 1: No assigned logger, invalid NaN/Inf telemetry, or zero valid readings available
+        if not has_assigned_logger or invalid_telemetry_detected or len(valid_readings_by_dt) == 0:
             return EvaluationResult(
                 expected_reading_count=expected_count,
-                actual_reading_count=0,
+                actual_reading_count=len(valid_readings_by_dt) if has_assigned_logger else 0,
                 missing_reading_count=expected_count,
                 max_telemetry_gap_min=trip_minutes,
                 telemetry_gap_flagged=True,
@@ -234,11 +316,11 @@ class ComplianceEngine:
         sorted_readings = [valid_readings_by_dt[dt] for dt in sorted_dts]
         actual_count = len(sorted_readings)
 
-        # Calculate missing readings strictly from the expected time grid, never raw row count (Bug 2 fix)
+        # Calculate missing readings strictly from the expected time grid (Priority 2 Fix)
         covered_grid_points = sum(1 for g_dt in expected_grid_dts if g_dt in valid_readings_by_dt)
         missing_count = max(0, expected_count - covered_grid_points)
 
-        # Compute telemetry gaps from consecutive reading timestamps + initial/tail gaps
+        # Compute telemetry gaps from both consecutive readings AND uncovered grid spans
         max_gap_min = 0
         first_dt = sorted_dts[0]
         initial_gap = max(0, int((first_dt - dep_dt).total_seconds() // 60))
@@ -258,14 +340,28 @@ class ComplianceEngine:
         if tail_gap > max_gap_min:
             max_gap_min = tail_gap
 
-        # Bug 1 & Bug 2 Fix:
-        # 1. Missing-data gap reaching OR exceeding (>=) policy.max_telemetry_gap_min is flagged.
-        # 2. Any missing grid points when duplicate timestamps occurred or missing departure/arrival endpoints
-        #    also flags insufficient telemetry evidence.
+        # Also check gap between covered points on the expected grid so off-grid readings
+        # (e.g. at minutes 0, 5, 15, 20 when minute 10 is missing) cannot mask a missing grid slot!
+        covered_grid_sorted = sorted(g_dt for g_dt in expected_grid_dts if g_dt in valid_readings_by_dt)
+        if covered_grid_sorted:
+            grid_init_gap = max(0, int((covered_grid_sorted[0] - dep_dt).total_seconds() // 60))
+            max_gap_min = max(max_gap_min, grid_init_gap)
+            for idx in range(1, len(covered_grid_sorted)):
+                g_delta = int((covered_grid_sorted[idx] - covered_grid_sorted[idx - 1]).total_seconds() // 60)
+                max_gap_min = max(max_gap_min, max(0, g_delta - sampling_interval_min))
+            grid_tail_gap = max(0, int((arr_dt - covered_grid_sorted[-1]).total_seconds() // 60))
+            max_gap_min = max(max_gap_min, grid_tail_gap)
+        else:
+            max_gap_min = trip_minutes
+
+        # Priority 2 Fix: Under our strict 10-minute grid contract, ANY missing expected grid point
+        # (`missing_count > 0`), off-grid reading, duplicate timestamp, or gap >= max_telemetry_gap_min
+        # flags insufficient telemetry evidence.
         telemetry_gap_flagged = (
             max_gap_min >= policy.max_telemetry_gap_min
+            or missing_count > 0
             or duplicate_detected
-            or (missing_count > 0 and max_gap_min > 0)
+            or off_grid_detected
         )
 
         # Temperature summary statistics
@@ -274,7 +370,10 @@ class ComplianceEngine:
         max_temp = round(max(temps), 2)
         mkt_c = compute_mkt_celsius(temps)
 
-        # Excursion duration & calibration uncertainty evaluation (Bug 3 Fix)
+        # Priority 3 Fix: Bounded Excursion Duration Calculation on [dep_dt, arr_dt]
+        # Each reading `i` at `t_i` holds over the disjoint interval `[t_i, t_next)` where
+        # `t_next = sorted_dts[i + 1]` for `i < actual_count - 1` and `t_next = arr_dt` for the last reading.
+        # This guarantees that the sum of all interval durations never exceeds `trip_minutes`.
         total_excursion_min = 0
         max_single_excursion_min = 0
         current_contiguous_excursion_min = 0
@@ -286,63 +385,60 @@ class ComplianceEngine:
         for idx, r in enumerate(sorted_readings):
             t = r.temperature_c
             unc = r.calibration_uncertainty_c
-            # Inclusive safe range: [min_temp_c, max_temp_c]. Strictly outside is a breach (QA-02).
             is_breach = (t < policy.min_temp_c) or (t > policy.max_temp_c)
             is_critical_peak = (t <= policy.critical_low_temp_c) or (t >= policy.critical_high_temp_c)
 
-            # Calibration uncertainty borderline check:
-            # Only flag borderline uncertainty when the reading is strictly inside the threshold
-            # boundary (not exactly equal to target, and within (0, unc] of min_temp_c or max_temp_c)
+            # Calibration uncertainty borderline rule:
+            # Flag when a reading is strictly inside the threshold boundary (0 < distance <= unc).
+            # Exact threshold values (distance == 0) are treated as inclusive compliant boundary points
+            # per documented policy convention.
             dist_low = abs(t - policy.min_temp_c)
             dist_high = abs(t - policy.max_temp_c)
             if (0.0 < dist_low <= unc) or (0.0 < dist_high <= unc):
                 uncertainty_borderline_flag = True
 
+            t_start = max(dep_dt, sorted_dts[idx])
+            t_end = min(arr_dt, sorted_dts[idx + 1] if (idx + 1) < actual_count else arr_dt)
+            interval_min = max(0, int((t_end - t_start).total_seconds() // 60))
+
+            # Check if there is an irregular / missing gap before or after this reading
+            prev_delta_min = (
+                int((sorted_dts[idx] - sorted_dts[idx - 1]).total_seconds() // 60)
+                if idx > 0
+                else int((sorted_dts[0] - dep_dt).total_seconds() // 60)
+            )
+            has_adjacent_gap = (interval_min > sampling_interval_min) or (
+                idx > 0 and prev_delta_min > sampling_interval_min
+            ) or (idx == 0 and prev_delta_min > 0)
+
             if is_breach:
                 if first_breach_id is None:
                     first_breach_id = r.reading_id
-
-                # Bug 3 Fix: Compute actual elapsed interval rather than assuming fixed 10 minutes
-                if idx > 0:
-                    actual_delta_min = int((sorted_dts[idx] - sorted_dts[idx - 1]).total_seconds() // 60)
-                else:
-                    actual_delta_min = sampling_interval_min
-
-                prev_was_breach = (
-                    idx > 0
-                    and (
-                        sorted_readings[idx - 1].temperature_c < policy.min_temp_c
-                        or sorted_readings[idx - 1].temperature_c > policy.max_temp_c
-                    )
-                )
-
-                if actual_delta_min > sampling_interval_min:
-                    # There is a missing-data gap immediately preceding this breach reading.
-                    # The true excursion duration across the gap is uncertain; conservatively account
-                    # for the full elapsed span if the previous reading was also in breach, and flag uncertainty!
-                    excursion_across_gap_uncertainty = True
-                    uncertainty_borderline_flag = True
-                    step_min = actual_delta_min if prev_was_breach else sampling_interval_min
-                else:
-                    step_min = sampling_interval_min
-
-                total_excursion_min += step_min
-                current_contiguous_excursion_min += step_min
-                if current_contiguous_excursion_min > max_single_excursion_min:
-                    max_single_excursion_min = current_contiguous_excursion_min
                 if is_critical_peak:
                     critical_peak_breach = True
+
+                if has_adjacent_gap or interval_min == 0:
+                    excursion_across_gap_uncertainty = has_adjacent_gap
+                    uncertainty_borderline_flag = True
+
+                # If the breach occurs only at the final arrival instant `t_start == arr_dt` (`interval_min == 0`),
+                # and the previous interval was a gap where the prior reading was also in breach, the gap duration
+                # was already accrued on the previous reading's hold `[t_{idx-1}, t_idx)`.
+                total_excursion_min += interval_min
+                current_contiguous_excursion_min += interval_min
+                if current_contiguous_excursion_min > max_single_excursion_min:
+                    max_single_excursion_min = current_contiguous_excursion_min
             else:
-                # If previous reading was a breach and current reading is after a gap, true duration is uncertain
-                if idx > 0:
-                    actual_delta_min = int((sorted_dts[idx] - sorted_dts[idx - 1]).total_seconds() // 60)
+                if idx > 0 and prev_delta_min > sampling_interval_min:
                     prev_t = sorted_readings[idx - 1].temperature_c
-                    if actual_delta_min > sampling_interval_min and (
-                        prev_t < policy.min_temp_c or prev_t > policy.max_temp_c
-                    ):
+                    if prev_t < policy.min_temp_c or prev_t > policy.max_temp_c:
                         excursion_across_gap_uncertainty = True
                         uncertainty_borderline_flag = True
                 current_contiguous_excursion_min = 0
+
+        # Ensure excursion durations never exceed total trip duration
+        total_excursion_min = min(trip_minutes, total_excursion_min)
+        max_single_excursion_min = min(trip_minutes, max_single_excursion_min)
 
         mkt_breach = mkt_c is not None and mkt_c > policy.max_mkt_c
 
@@ -407,3 +503,182 @@ class ComplianceEngine:
             first_breach_reading_id=first_breach_id,
             evaluated_by_actor=actor,
         )
+
+    @staticmethod
+    def audit_shipment_record(
+        shipment: Dict[str, Any],
+        report: Dict[str, Any],
+        policies: List[PolicyThresholds],
+        assigned_logger_ids: List[str],
+        readings: List[ReadingPoint],
+        custody_events: List[Dict[str, Any]],
+    ) -> OperationalAuditResult:
+        """
+        Priority 1 Fix: Pure Operational QA Audit of a single shipment.
+        Reads ONLY master/transaction/event records and the original ExcursionReport.
+        NEVER accesses GroundTruth.
+        """
+        sid = shipment["shipment_id"]
+        true_pol = select_effective_policy_for_product(
+            policies=policies,
+            product_id=shipment["primary_product_id"],
+            departure_utc=shipment["actual_departure_utc"],
+            arrival_utc=shipment["actual_arrival_utc"],
+        )
+
+        # Compute custody gaps from handoff start/end timestamps if present, or handover_gap_min
+        custody_gaps: List[int] = []
+        flagged_custody_ids: List[str] = []
+        for ce in custody_events:
+            if ce.get("handoff_started_utc") and ce.get("event_timestamp_utc"):
+                st_dt = parse_iso_utc(ce["handoff_started_utc"])
+                en_dt = parse_iso_utc(ce["event_timestamp_utc"])
+                gap_val = max(0, int((en_dt - st_dt).total_seconds() // 60))
+            else:
+                gap_val = int(ce["handover_gap_min"])
+            custody_gaps.append(gap_val)
+            if gap_val > true_pol.max_custody_gap_min:
+                flagged_custody_ids.append(ce["custody_event_id"])
+
+        recomputed_eval = ComplianceEngine.evaluate_shipment(
+            actual_departure_utc=shipment["actual_departure_utc"],
+            actual_arrival_utc=shipment["actual_arrival_utc"],
+            policy=true_pol,
+            readings=readings,
+            custody_handover_gaps_min=custody_gaps,
+            has_assigned_logger=len(assigned_logger_ids) > 0,
+            sampling_interval_min=10,
+            expected_product_id=shipment["primary_product_id"],
+            expected_shipment_id=sid,
+            expected_logger_ids=set(assigned_logger_ids) if assigned_logger_ids else None,
+        )
+
+        # Identify operational process anomalies purely from relational & telemetry discrepancies
+        detected_anomaly = "NONE"
+        evidence_list: List[str] = [report["report_id"]]
+
+        if len(assigned_logger_ids) == 0 or report.get("logger_id_evaluated") is None:
+            detected_anomaly = "LOGGER_NOT_ASSIGNED"
+            evidence_list.append("NO_SHIPMENT_LOGGER_ASSIGNMENT")
+        elif (
+            shipment["assigned_policy_id"] != true_pol.policy_id
+            or report["policy_id_evaluated"] != true_pol.policy_id
+        ):
+            detected_anomaly = "PRODUCT_THRESHOLD_MISMATCH"
+            evidence_list.append(f"ASSIGNED:{shipment['assigned_policy_id']}!=CANONICAL:{true_pol.policy_id}")
+        elif recomputed_eval.telemetry_gap_flagged and not report["telemetry_gap_flagged"]:
+            detected_anomaly = "MISSING_DATA_SILENTLY_PASSED"
+            evidence_list.append(f"MISSING_READINGS:{recomputed_eval.missing_reading_count}")
+        elif recomputed_eval.custody_gap_flagged and not report["custody_gap_flagged"]:
+            detected_anomaly = "CUSTODY_GAP_NOT_FLAGGED"
+            evidence_list.extend(flagged_custody_ids)
+        elif report["total_excursion_duration_min"] != recomputed_eval.total_excursion_duration_min:
+            detected_anomaly = "CROSS_SHIPMENT_EXCURSION_CALC"
+            evidence_list.append(
+                f"REPORTED_EXC_MIN:{report['total_excursion_duration_min']}!=TRUE_EXC_MIN:{recomputed_eval.total_excursion_duration_min}"
+            )
+
+        if recomputed_eval.first_breach_reading_id:
+            evidence_list.append(recomputed_eval.first_breach_reading_id)
+
+        requires_override = (
+            detected_anomaly != "NONE"
+            or report["compliance_status"] != recomputed_eval.compliance_status
+            or report["disposition_decision"] != recomputed_eval.disposition_decision
+        )
+
+        if detected_anomaly != "NONE":
+            summary = (
+                f"Operational QA Audit detected '{detected_anomaly}': "
+                f"ExcursionReport ({report['compliance_status']} / {report['disposition_decision']}) "
+                f"recomputed to ({recomputed_eval.compliance_status} / {recomputed_eval.disposition_decision})."
+            )
+        else:
+            summary = (
+                f"Operational QA Audit verified report {report['report_id']}: "
+                f"{recomputed_eval.compliance_status} ({recomputed_eval.disposition_decision})."
+            )
+
+        return OperationalAuditResult(
+            shipment_id=sid,
+            report_id=report["report_id"],
+            canonical_policy_id=true_pol.policy_id,
+            assigned_policy_id=shipment["assigned_policy_id"],
+            detected_anomaly_type=detected_anomaly,
+            has_operational_defect=detected_anomaly != "NONE",
+            recomputed_eval=recomputed_eval,
+            reported_compliance_status=report["compliance_status"],
+            reported_disposition_decision=report["disposition_decision"],
+            audited_compliance_status=recomputed_eval.compliance_status,
+            audited_disposition_decision=recomputed_eval.disposition_decision,
+            requires_corrective_override=requires_override,
+            evidence_ids=";".join(evidence_list),
+            audit_summary=summary,
+        )
+
+    @staticmethod
+    def audit_dataset(datasets: Dict[str, List[Dict[str, Any]]]) -> Dict[str, OperationalAuditResult]:
+        """
+        Run `audit_shipment_record` across all shipments in `datasets` without touching `GroundTruth`.
+        Works even when `GroundTruth` key is completely absent from `datasets`.
+        """
+        policies: List[PolicyThresholds] = [
+            PolicyThresholds(
+                policy_id=p["policy_id"],
+                product_id=p["product_id"],
+                min_temp_c=float(p["min_temp_c"]),
+                max_temp_c=float(p["max_temp_c"]),
+                critical_low_temp_c=float(p["critical_low_temp_c"]),
+                critical_high_temp_c=float(p["critical_high_temp_c"]),
+                max_single_excursion_min=int(p["max_single_excursion_min"]),
+                max_cumulative_excursion_min=int(p["max_cumulative_excursion_min"]),
+                max_mkt_c=float(p["max_mkt_c"]),
+                max_telemetry_gap_min=int(p["max_telemetry_gap_min"]),
+                max_custody_gap_min=int(p.get("max_custody_gap_min", CUSTODY_GAP_THRESHOLD_MIN)),
+                effective_from=p.get("effective_from", "2026-01-01T00:00:00Z"),
+                effective_to=p.get("effective_to") or None,
+                version=int(p.get("version", 1)),
+            )
+            for p in datasets["ThresholdPolicy"]
+        ]
+
+        assigned_loggers_by_shp: Dict[str, List[str]] = {}
+        for sl in datasets["ShipmentLogger"]:
+            assigned_loggers_by_shp.setdefault(sl["shipment_id"], []).append(sl["logger_id"])
+
+        readings_by_shp: Dict[str, List[ReadingPoint]] = {}
+        for r in datasets["TemperatureReading"]:
+            sid = r.get("shipment_id")
+            if not sid:
+                continue
+            readings_by_shp.setdefault(sid, []).append(
+                ReadingPoint(
+                    reading_id=r["reading_id"],
+                    logger_id=r["logger_id"],
+                    shipment_id=sid,
+                    sequence_no=int(r["sequence_no"]),
+                    recorded_at_utc=r["recorded_at_utc"],
+                    temperature_c=float(r["temperature_c"]),
+                    calibration_uncertainty_c=float(r["calibration_uncertainty_c"]),
+                    elapsed_since_prev_min=int(r["elapsed_since_prev_min"]),
+                )
+            )
+
+        custody_by_shp: Dict[str, List[Dict[str, Any]]] = {}
+        for ce in datasets["CustodyEvent"]:
+            custody_by_shp.setdefault(ce["shipment_id"], []).append(ce)
+
+        report_by_shp = {er["shipment_id"]: er for er in datasets["ExcursionReport"]}
+
+        results: Dict[str, OperationalAuditResult] = {}
+        for shp in datasets["Shipment"]:
+            sid = shp["shipment_id"]
+            results[sid] = ComplianceEngine.audit_shipment_record(
+                shipment=shp,
+                report=report_by_shp[sid],
+                policies=policies,
+                assigned_logger_ids=assigned_loggers_by_shp.get(sid, []),
+                readings=readings_by_shp.get(sid, []),
+                custody_events=custody_by_shp.get(sid, []),
+            )
+        return results
