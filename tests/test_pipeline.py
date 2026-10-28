@@ -608,10 +608,13 @@ class TestColdChainCompliancePlatform(unittest.TestCase):
     def test_20_priority4_and_priority5_validator_catches_expired_logger_deleted_history_and_state_mismatch(self) -> None:
         """
         Priority 4 & Priority 5 Regression:
-        Verify that `DatasetValidator` catches all 3 reproduced mutations from the review:
-        1) Expiring a logger calibration before the shipment (`calibration_expiry_date = 2025-12-01`).
-        2) Deleting `ShipmentStateHistory` rows for a shipment.
-        3) Changing `Shipment.lifecycle_state` so it disagrees with `ShipmentStateHistory` and `ComplianceReview`.
+        Verify that `DatasetValidator` AND `ComplianceEngine.audit_dataset` / `inspector` catch:
+        1) Expiring a logger calibration before the shipment (`calibration_expiry_date = 2025-12-01`) ->
+           Validator fails AND operational auditor / inspector routes shipment to INVESTIGATION_REQUIRED / QUARANTINE_HOLD
+           (never COMPLIANT).
+        2) Deleting `ComplianceReview` for a shipment (`SHP-2026-000001`) -> Validator fails (`overall_passed == False`).
+        3) Deleting `ShipmentStateHistory` rows for a shipment -> Validator fails.
+        4) Changing `Shipment.lifecycle_state` so it disagrees with `ShipmentStateHistory` and `ComplianceReview` -> Validator fails.
         """
         # Mutation 1: Expired logger calibration before shipment
         ds_exp_logger = copy.deepcopy(self.datasets)
@@ -620,7 +623,28 @@ class TestColdChainCompliancePlatform(unittest.TestCase):
         self.assertFalse(res_exp_logger["date_ordering"]["passed"])
         self.assertFalse(res_exp_logger["overall_passed"])
 
-        # Mutation 2: Delete ShipmentStateHistory rows for SHP-2026-000001
+        # Operational auditor and inspector must ALSO flag the expired logger as INVESTIGATION_REQUIRED / QUARANTINE_HOLD
+        audit_exp = ComplianceEngine.audit_dataset(ds_exp_logger)["SHP-2026-000001"]
+        self.assertEqual(audit_exp.detected_anomaly_type, "LOGGER_CALIBRATION_EXPIRED")
+        self.assertEqual(audit_exp.audited_compliance_status, "INVESTIGATION_REQUIRED")
+        self.assertEqual(audit_exp.audited_disposition_decision, "QUARANTINE_HOLD")
+        buf_exp = io.StringIO()
+        with redirect_stdout(buf_exp):
+            inspect_shipment(ds_exp_logger, "SHP-2026-000001")
+        self.assertIn("LOGGER_CALIBRATION_EXPIRED", buf_exp.getvalue())
+        self.assertIn("INVESTIGATION_REQUIRED (QUARANTINE_HOLD)", buf_exp.getvalue())
+
+        # Mutation 2: Delete ComplianceReview row for SHP-2026-000001 -> must fail validation
+        ds_del_rev = copy.deepcopy(self.datasets)
+        ds_del_rev["ComplianceReview"] = [
+            rv for rv in ds_del_rev["ComplianceReview"] if rv["shipment_id"] != "SHP-2026-000001"
+        ]
+        res_del_rev = DatasetValidator(ds_del_rev).run_all_checks()
+        self.assertFalse(res_del_rev["foreign_key_integrity"]["passed"])
+        self.assertFalse(res_del_rev["independent_anomaly_audit"]["passed"])
+        self.assertFalse(res_del_rev["overall_passed"])
+
+        # Mutation 3: Delete ShipmentStateHistory rows for SHP-2026-000001
         ds_del_hist = copy.deepcopy(self.datasets)
         ds_del_hist["ShipmentStateHistory"] = [
             ev for ev in ds_del_hist["ShipmentStateHistory"] if ev["shipment_id"] != "SHP-2026-000001"
@@ -629,7 +653,7 @@ class TestColdChainCompliancePlatform(unittest.TestCase):
         self.assertFalse(res_del_hist["lifecycle_transitions"]["passed"])
         self.assertFalse(res_del_hist["overall_passed"])
 
-        # Mutation 3: Change Shipment.lifecycle_state so it disagrees with history & disposition
+        # Mutation 4: Change Shipment.lifecycle_state so it disagrees with history & disposition
         ds_bad_state = copy.deepcopy(self.datasets)
         ds_bad_state["Shipment"][0]["lifecycle_state"] = "CLOSED_REJECTED"
         res_bad_state = DatasetValidator(ds_bad_state).run_all_checks()

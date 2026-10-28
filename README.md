@@ -54,6 +54,8 @@ python -m src.generator --seed 20261022 --scale starter --output-dir data/starte
 python -m src.generator --seed 20261022 --scale full --output-dir data/full
 
 # Run the standalone validator & two-run reproducibility verifier (in-memory or on exported files)
+# Note: data/starter is committed complete and passes --input-dir directly; for data/full, run
+# `python -m src.cli --seed 20261022` (or `src.generator --scale full`) first to populate the large SQL/JSON exports.
 python -m src.validator --seed 20261022 --scale full --report-out docs/VALIDATION_REPORT.json
 python -m src.validator --input-dir data/starter --scale starter
 

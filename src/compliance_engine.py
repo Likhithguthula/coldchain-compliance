@@ -512,11 +512,18 @@ class ComplianceEngine:
         assigned_logger_ids: List[str],
         readings: List[ReadingPoint],
         custody_events: List[Dict[str, Any]],
+        assigned_logger_rows: Optional[List[Dict[str, Any]]] = None,
+        assigned_assignment_rows: Optional[List[Dict[str, Any]]] = None,
     ) -> OperationalAuditResult:
         """
         Priority 1 Fix: Pure Operational QA Audit of a single shipment.
         Reads ONLY master/transaction/event records and the original ExcursionReport.
         NEVER accesses GroundTruth.
+        Also verifies physical logger calibration validity (`calibration_date <= departure_date`,
+        `calibration_expiry_date >= arrival_date`, `lifecycle_state == 'ACTIVE_CALIBRATED'`) and
+        assignment activation window coverage (`activated_utc <= actual_departure_utc`,
+        `deactivated_utc >= actual_arrival_utc`). Any invalid/expired calibration routes the shipment
+        to `INVESTIGATION_REQUIRED` / `QUARANTINE_HOLD`.
         """
         sid = shipment["shipment_id"]
         true_pol = select_effective_policy_for_product(
@@ -525,6 +532,45 @@ class ComplianceEngine:
             departure_utc=shipment["actual_departure_utc"],
             arrival_utc=shipment["actual_arrival_utc"],
         )
+
+        # Verify assigned logger calibration and activation windows
+        calibration_invalid = False
+        calibration_evidence: List[str] = []
+        dep_dt = parse_iso_utc(shipment["actual_departure_utc"])
+        arr_dt = parse_iso_utc(shipment["actual_arrival_utc"])
+        dep_date = dep_dt.date().isoformat()
+        arr_date = arr_dt.date().isoformat()
+
+        if assigned_logger_rows is not None:
+            if len(assigned_logger_rows) < len(assigned_logger_ids):
+                calibration_invalid = True
+                calibration_evidence.append("MISSING_LOGGER_MASTER_RECORD")
+            for lg in assigned_logger_rows:
+                cal_from = str(lg.get("calibration_date", ""))
+                cal_exp = str(lg.get("calibration_expiry_date", ""))
+                lg_state = str(lg.get("lifecycle_state", ""))
+                if (
+                    not cal_from
+                    or not cal_exp
+                    or cal_from >= cal_exp
+                    or cal_from > dep_date
+                    or cal_exp < arr_date
+                    or lg_state != "ACTIVE_CALIBRATED"
+                ):
+                    calibration_invalid = True
+                    calibration_evidence.append(
+                        f"INVALID_LOGGER_CALIBRATION:{lg.get('logger_id')}[{cal_from}..{cal_exp},{lg_state}]"
+                    )
+
+        if assigned_assignment_rows is not None:
+            for assgn in assigned_assignment_rows:
+                act_dt = parse_iso_utc(assgn["activated_utc"])
+                deact_dt = parse_iso_utc(assgn["deactivated_utc"])
+                if act_dt >= deact_dt or act_dt > dep_dt or deact_dt < arr_dt:
+                    calibration_invalid = True
+                    calibration_evidence.append(
+                        f"INVALID_ASSIGNMENT_WINDOW:{assgn.get('assignment_id')}"
+                    )
 
         # Compute custody gaps from handoff start/end timestamps if present, or handover_gap_min
         custody_gaps: List[int] = []
@@ -553,6 +599,27 @@ class ComplianceEngine:
             expected_logger_ids=set(assigned_logger_ids) if assigned_logger_ids else None,
         )
 
+        # If logger calibration or assignment coverage is invalid/expired, force INVESTIGATION_REQUIRED / QUARANTINE_HOLD
+        if calibration_invalid:
+            recomputed_eval = EvaluationResult(
+                expected_reading_count=recomputed_eval.expected_reading_count,
+                actual_reading_count=recomputed_eval.actual_reading_count,
+                missing_reading_count=recomputed_eval.missing_reading_count,
+                max_telemetry_gap_min=recomputed_eval.max_telemetry_gap_min,
+                telemetry_gap_flagged=recomputed_eval.telemetry_gap_flagged,
+                custody_gap_flagged=recomputed_eval.custody_gap_flagged,
+                min_recorded_temp_c=recomputed_eval.min_recorded_temp_c,
+                max_recorded_temp_c=recomputed_eval.max_recorded_temp_c,
+                mean_kinetic_temp_c=recomputed_eval.mean_kinetic_temp_c,
+                total_excursion_duration_min=recomputed_eval.total_excursion_duration_min,
+                max_single_excursion_min=recomputed_eval.max_single_excursion_min,
+                uncertainty_borderline_flag=True,
+                compliance_status="INVESTIGATION_REQUIRED",
+                disposition_decision="QUARANTINE_HOLD",
+                first_breach_reading_id=recomputed_eval.first_breach_reading_id,
+                evaluated_by_actor="OPERATIONS_MANAGER",
+            )
+
         # Identify operational process anomalies purely from relational & telemetry discrepancies
         detected_anomaly = "NONE"
         evidence_list: List[str] = [report["report_id"]]
@@ -560,6 +627,9 @@ class ComplianceEngine:
         if len(assigned_logger_ids) == 0 or report.get("logger_id_evaluated") is None:
             detected_anomaly = "LOGGER_NOT_ASSIGNED"
             evidence_list.append("NO_SHIPMENT_LOGGER_ASSIGNMENT")
+        elif calibration_invalid:
+            detected_anomaly = "LOGGER_CALIBRATION_EXPIRED"
+            evidence_list.extend(calibration_evidence)
         elif (
             shipment["assigned_policy_id"] != true_pol.policy_id
             or report["policy_id_evaluated"] != true_pol.policy_id
@@ -642,9 +712,14 @@ class ComplianceEngine:
             for p in datasets["ThresholdPolicy"]
         ]
 
+        logger_by_id: Dict[str, Dict[str, Any]] = {
+            lg["logger_id"]: lg for lg in datasets.get("Logger", [])
+        }
         assigned_loggers_by_shp: Dict[str, List[str]] = {}
+        assigned_rows_by_shp: Dict[str, List[Dict[str, Any]]] = {}
         for sl in datasets["ShipmentLogger"]:
             assigned_loggers_by_shp.setdefault(sl["shipment_id"], []).append(sl["logger_id"])
+            assigned_rows_by_shp.setdefault(sl["shipment_id"], []).append(sl)
 
         readings_by_shp: Dict[str, List[ReadingPoint]] = {}
         for r in datasets["TemperatureReading"]:
@@ -673,12 +748,16 @@ class ComplianceEngine:
         results: Dict[str, OperationalAuditResult] = {}
         for shp in datasets["Shipment"]:
             sid = shp["shipment_id"]
+            lids = assigned_loggers_by_shp.get(sid, [])
+            lrows = [logger_by_id[lid] for lid in lids if lid in logger_by_id]
             results[sid] = ComplianceEngine.audit_shipment_record(
                 shipment=shp,
                 report=report_by_shp[sid],
                 policies=policies,
-                assigned_logger_ids=assigned_loggers_by_shp.get(sid, []),
+                assigned_logger_ids=lids,
                 readings=readings_by_shp.get(sid, []),
                 custody_events=custody_by_shp.get(sid, []),
+                assigned_logger_rows=lrows,
+                assigned_assignment_rows=assigned_rows_by_shp.get(sid, []),
             )
         return results

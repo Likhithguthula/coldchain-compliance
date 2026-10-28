@@ -1147,6 +1147,8 @@ class SyntheticDataGenerator:
 
             # Run operational QA audit on the shipment's raw records and ExcursionReport (Priority 4)
             assigned_logger_ids = [logger_id] if has_assigned_logger else []
+            assigned_logger_rows = [logger_row] if has_assigned_logger else []
+            assigned_assignment_rows = [self.shipment_loggers[-1]] if has_assigned_logger else []
             shp_custody_rows = self.custody_events[-len(cust_events_spec):]
             audit_res = ComplianceEngine.audit_shipment_record(
                 shipment=shipment_row,
@@ -1155,6 +1157,8 @@ class SyntheticDataGenerator:
                 assigned_logger_ids=assigned_logger_ids,
                 readings=trip_reading_points,
                 custody_events=shp_custody_rows,
+                assigned_logger_rows=assigned_logger_rows,
+                assigned_assignment_rows=assigned_assignment_rows,
             )
 
             review_id = f"REV-2026-{shp_idx:06d}"

@@ -302,7 +302,7 @@ Preserves the original `ExcursionReport` without overwriting history while recor
 | `canonical_policy_id` | `STRING` | Required | `POL-2026-\d{4}` | N/A | Foreign Key | Must exist in `ThresholdPolicy.policy_id` and match `Shipment.primary_product_id` |
 | `policy_version` | `INTEGER` | Required | `>= 1` | N/A | Non-unique | Matches `ThresholdPolicy.version` |
 | `evidence_ids` | `STRING` | Required | Semicolon-delimited IDs | N/A | Non-unique | References `report_id`, `reading_id`, or `custody_event_id` evidence |
-| `anomaly_type` | `ENUM` | Required | `NONE`, `LOGGER_NOT_ASSIGNED`, `PRODUCT_THRESHOLD_MISMATCH`, `MISSING_DATA_SILENTLY_PASSED`, `CUSTODY_GAP_NOT_FLAGGED`, `CROSS_SHIPMENT_EXCURSION_CALC` | N/A | Non-unique | Derived strictly from operational records |
+| `anomaly_type` | `ENUM` | Required | `NONE`, `LOGGER_NOT_ASSIGNED`, `LOGGER_CALIBRATION_EXPIRED`, `PRODUCT_THRESHOLD_MISMATCH`, `MISSING_DATA_SILENTLY_PASSED`, `CUSTODY_GAP_NOT_FLAGGED`, `CROSS_SHIPMENT_EXCURSION_CALC` | N/A | Non-unique | Derived strictly from operational records |
 | `original_status` | `ENUM` | Required | Same as `ExcursionReport.compliance_status` | N/A | Non-unique | Matches `ExcursionReport.compliance_status` |
 | `original_disposition` | `ENUM` | Required | Same as `ExcursionReport.disposition_decision` | N/A | Non-unique | Matches `ExcursionReport.disposition_decision` |
 | `audited_status` | `ENUM` | Required | Valid compliance status enum | N/A | Non-unique | Reconstructed from canonical policy, telemetry grid, and custody handoffs |

@@ -128,7 +128,11 @@ The README says the project was tested on Python 3.14.5, but my verification env
 ---
 
 ### Tool B: OpenAI ChatGPT — Prompt 3 (Deep-Dive 28 October 2026 Adversarial Submission Review)
-**Attachments**: `Yotta.zip` and `YOTTAFLEX SUBMISSION REVIEW - 28 OCTOBER 2026` evaluation report.
+**Attachments**: `Yotta.zip`, `Candidate Project Submission Guidelines.pdf`, `Candidate Project FAQ.pdf`, and Problem Statement.  
+**Export Limitation Note**: The user uploaded the exported evaluation report (`YOTTAFLEX SUBMISSION REVIEW - 28 OCTOBER 2026` / `YOTTAFLEX_REVIEW_REPORT_2026-10-28.txt`) directly rather than a third ChatGPT share URL, so the review prompt below is reconstructed from the user's review workflow and the report's opening scope statement:
+```text
+Review the updated Yotta.zip submission end-to-end against the YottaFlex Candidate Project Submission Guidelines, Candidate Project FAQ, and Cold-Chain Shipment Compliance problem statement. Execute the full pipeline, validator, inspector, and automated tests, and also perform adversarial mutation testing (deleting ground truth, expiring logger calibration, deleting state history, testing off-grid missing readings, and testing 10-minute/0-minute excursion boundary windows) to identify any remaining code, data, validation, or documentation issues before final submission.
+```
 **Summary of Findings from the 28 October 2026 Evaluation Report**:
 - **Priority 1 (Remove Answer-Key Dependence from Operations)**: `src/inspector.py` previously read `GroundTruth` to display audited outcomes and exception queues. Extracted `ComplianceEngine.audit_shipment_record` / `ComplianceEngine.audit_dataset` to operate strictly on master/transaction/event tables and `ExcursionReport`, with zero dependency on `GroundTruth` (`test_17`).
 - **Priority 2 (Fix Missing-Grid False Release)**: Under the strict 10-minute grid contract, any `missing_reading_count > 0` or off-grid timestamp (e.g., readings at `00, 05, 15, 20` on a `00-20` trip with `max_telemetry_gap_min = 20`) now sets `telemetry_gap_flagged = True` and prevents `COMPLIANT` release (`test_18`).
@@ -147,9 +151,52 @@ Prompt 6: read the evaluation file and all the test cases are passed but some ma
 
 ---
 
+### Tool B: OpenAI ChatGPT — Prompt 4 (Verification of Oct 28 Fixes & Final 3 Targeted Checks)
+**Submitted**: `2026-10-28` (Exported verification summary pasted into Antigravity Prompt 7 below; the ChatGPT session itself was not exported via a share link, which is disclosed here per FAQ #6)
+```text
+Verify the updated ColdChain Compliance submission after applying the Priority 1-5 fixes, check all 21 automated tests and end-to-end pipeline outputs, and test whether any edge-case mutations (expired logger calibration in the operational inspector, deleting a single ComplianceReview row, or prompt history completeness) remain before final submission.
+```
+
+---
+
+### Tool A: Google Antigravity — Prompt 7 (Final 3 Targeted Corrections & GitHub Push)
+**Submitted**: `2026-10-28T12:07:26+05:30` & `2026-10-28T12:08:15+05:30`
+```text
+Verified results
+
+Check	Result
+Automated tests	21/21 passed
+End-to-end pipeline	Passed, approximately 9 seconds
+Required volume	5,000 shipments, 1,000 loggers, 93,395 readings
+Required negative scenarios	All five detected; 50 examples each
+Fixed-seed reproducibility	Passed for starter and full scale
+Ground-truth separation	Inspector now computes audit results independently
+Excursion duration	Previous endpoint overcount corrected
+Correction history	ComplianceReview and corrective lifecycle events added
+Product/scenario coverage	Improved to 110/110 combinations
+Finish these three items
+
+Prevent the inspector from showing expired-loggers as compliant.
+I expired an assigned logger’s calibration. The validator correctly failed, but the operational auditor still returned COMPLIANT.
+Correction: validate imported operational data before displaying effective compliance, or include calibration checks directly in the operational audit. Invalid calibration should produce a hold/investigation.
+
+Require a review record for every shipment.
+Deleting ComplianceReview for SHP-2026-000001 still produced overall_passed=True, even though review accuracy dropped to 99.6%.
+Correction: require exactly one review per shipment under the documented schema, and fail validation when a review is missing.
+
+Complete the actual AI prompt history.
+The October 28 entry contains a findings summary rather than the actual review prompt. Add the prompts from this conversation and the final correction prompts. Disclose any export limitations honestly.
+
+These are focused changes—avoid adding features or changing frameworks now.
+
+One packaging detail: the full manifest references two intentionally uncommitted files, json/TemperatureReading.json and sql/seed_data.sql. Reviewers must run the documented generation command before validating the full exported directory. The committed starter package passes directly. read the description and complete what is there and update the github link is https://github.com/Likhithguthula/coldchain-compliance
+```
+
+---
+
 ### Disclosure on Prompt Export & Tool Limitations (FAQ #6)
-- All prompts submitted to **Google Antigravity** were extracted verbatim from the local session transcript (`transcript.jsonl`).
-- All prompts and QA findings from **OpenAI ChatGPT** were recovered directly from the two public share links (`https://chatgpt.com/share/6ae08dbc-9e40-83ee-9465-c207ba152e88` and `https://chatgpt.com/share/6ae0b619-e3bc-83e8-862d-98c3dceab3a5`). No other AI tools were used.
+- All prompts submitted to **Google Antigravity** (Prompts 1 through 7) were recorded verbatim from the local session transcript (`transcript.jsonl`).
+- For **OpenAI ChatGPT**, Prompts 1 and 2 were recovered directly from the public share links (`https://chatgpt.com/share/6ae08dbc-9e40-83ee-9465-c207ba152e88` and `https://chatgpt.com/share/6ae0b619-e3bc-83e8-862d-98c3dceab3a5`). For ChatGPT Prompts 3 and 4 (28 October 2026), the reviewer outputs (`YOTTAFLEX SUBMISSION REVIEW - 28 OCTOBER 2026` text files and the verification checklist above) were exported and provided directly in the conversation rather than via a public share link; therefore, the exact review prompts submitted to ChatGPT for those two rounds are reconstructed above from the user's instructions and report headers, and this export limitation is explicitly disclosed in accordance with FAQ #6. No other AI tools were used.
 
 ---
 

@@ -107,6 +107,7 @@ ALLOWED_ENUMS = {
     "ComplianceReview.anomaly_type": {
         "NONE",
         "LOGGER_NOT_ASSIGNED",
+        "LOGGER_CALIBRATION_EXPIRED",
         "PRODUCT_THRESHOLD_MISMATCH",
         "MISSING_DATA_SILENTLY_PASSED",
         "CUSTODY_GAP_NOT_FLAGGED",
@@ -285,6 +286,31 @@ class DatasetValidator:
                             f"ExcursionReport {er['report_id']}: first_breach_reading_id {fb_id} belongs to "
                             f"logger {rd['logger_id']} != {er['logger_id_evaluated']}"
                         )
+
+        # Require 1:1 ExcursionReport and 1:1 ComplianceReview for every Shipment under the documented schema
+        rep_count_by_shp: Dict[str, int] = {}
+        for er in self.datasets.get("ExcursionReport", []):
+            rep_count_by_shp[er["shipment_id"]] = rep_count_by_shp.get(er["shipment_id"], 0) + 1
+
+        rev_count_by_shp: Dict[str, int] = {}
+        for rv in self.datasets.get("ComplianceReview", []):
+            rev_count_by_shp[rv["shipment_id"]] = rev_count_by_shp.get(rv["shipment_id"], 0) + 1
+            rep_row = rep_by_id.get(rv.get("report_id"))
+            if rep_row and rep_row["shipment_id"] != rv["shipment_id"]:
+                errors.append(
+                    f"ComplianceReview {rv['review_id']}: report_id {rv['report_id']} belongs to "
+                    f"shipment {rep_row['shipment_id']} != {rv['shipment_id']}"
+                )
+
+        for sid in shp_ids:
+            if rep_count_by_shp.get(sid, 0) != 1:
+                errors.append(
+                    f"Shipment {sid}: expected exactly 1 ExcursionReport, found {rep_count_by_shp.get(sid, 0)}"
+                )
+            if rev_count_by_shp.get(sid, 0) != 1:
+                errors.append(
+                    f"Shipment {sid}: expected exactly 1 ComplianceReview, found {rev_count_by_shp.get(sid, 0)}"
+                )
 
         return {
             "passed": len(errors) == 0,
@@ -620,10 +646,12 @@ class DatasetValidator:
             gt = gt_by_shp.get(sid)
 
             if detected_edge != "NONE":
-                detected_counts[detected_edge] += 1
+                detected_counts[detected_edge] = detected_counts.get(detected_edge, 0) + 1
 
-            # Verify persisted ComplianceReview matches operational audit
-            if rev is not None:
+            # Verify persisted ComplianceReview exists and matches operational audit
+            if rev is None:
+                mismatches.append(f"{sid}: Missing required ComplianceReview record")
+            else:
                 if (
                     rev["anomaly_type"] == detected_edge
                     and rev["audited_status"] == audit_res.audited_compliance_status
@@ -685,13 +713,15 @@ class DatasetValidator:
         )
 
         return {
-            "passed": len(mismatches) == 0 and all(v > 0 for v in detected_counts.values()),
+            "passed": (
+                len(mismatches) == 0
+                and post_audit_review_matches == total_shipments
+                and all(v > 0 for v in detected_counts.values())
+            ),
             "total_shipments_audited": total_shipments,
             "ground_truth_exact_matches": gt_matches,
             "ground_truth_reconstruction_accuracy_pct": round((gt_matches / total_shipments) * 100.0, 2),
-            "post_audit_review_accuracy_pct": round((post_audit_review_matches / total_shipments) * 100.0, 2)
-            if review_by_shp
-            else 100.0,
+            "post_audit_review_accuracy_pct": round((post_audit_review_matches / total_shipments) * 100.0, 2),
             "original_report_decision_accuracy_pct": round((original_report_status_matches / total_shipments) * 100.0, 2),
             "original_report_disposition_accuracy_pct": round((original_report_disposition_matches / total_shipments) * 100.0, 2),
             "edge_case_detection_precision_pct": precision,
